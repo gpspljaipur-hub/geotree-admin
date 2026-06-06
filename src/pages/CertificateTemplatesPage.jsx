@@ -126,70 +126,118 @@ export default function CertificateTemplatesPage() {
 
   if (designerOpen) {
     return (
-      <div className="flex flex-col bg-white min-h-[calc(100vh-140px)] rounded-[24px] shadow-sm border border-gray-100 overflow-hidden">
-        <div className="flex items-center justify-between px-8 min-h-[70px] border-b border-gray-100 bg-gray-50/50">
-          <h2 className="m-0 text-[18px] font-black text-gray-900 tracking-tight">{editingId ? 'Edit Template' : 'Create New Template'}</h2>
-          <button className="p-2 border-0 bg-transparent text-gray-400 hover:text-gray-900 cursor-pointer transition-colors" onClick={() => setDesignerOpen(false)} type="button"><Icon name="x" size={20} /></button>
+      <div className="fixed inset-0 z-[100] flex flex-col bg-white">
+        <div className="flex items-center justify-between px-8 min-h-[70px] border-b border-gray-100 bg-white shadow-sm relative z-10">
+          <h2 className="m-0 text-[20px] font-bold text-gray-800 tracking-tight">{editingId ? 'Edit Template' : 'Create New Template'}</h2>
+          <button className="p-2 border-0 bg-transparent text-gray-400 hover:text-gray-900 cursor-pointer transition-colors" onClick={() => setDesignerOpen(false)} type="button"><Icon name="x" size={24} /></button>
         </div>
         <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
-          <section className="flex-1 p-8 lg:border-r border-gray-100 overflow-y-auto">
-            <h3 className="text-[11px] font-black tracking-widest text-pink uppercase mb-6 pb-3 border-b border-gray-100 m-0">TEMPLATE CONFIGURATION</h3>
-            <div className="flex flex-col gap-6 mb-10">
-              <Field label="Template Name" required placeholder="e.g. Summer Campaign 2024" value={formValues.name} onChange={(v) => setFormValues(f => ({...f, name: v}))} full />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Field label="Issue Category" required type="select" options={['Occasion', 'Carbon Offset', 'IPL Dot Ball', 'Support Team']} value={formValues.category} onChange={(v) => setFormValues(f => ({...f, category: v}))} />
-                <Field label="Certificate Title" value={formValues.title} onChange={(v) => setFormValues(f => ({...f, title: v}))} />
-              </div>
-              
-              <div className="flex flex-col gap-2 mt-4">
-                <Field label="Background Image (Template File)" type="file" full onChange={(val) => setFormValues(f => ({...f, template_file: val}))} />
-                {formValues.template_file && (
-                  <div className="flex items-center gap-3 mt-1 p-2 bg-gray-50 rounded-xl border border-gray-100 w-max pr-4">
-                    <img 
-                      src={typeof formValues.template_file === 'string' ? `${API_CONFIG.IMAGE_URL}${formValues.template_file}` : URL.createObjectURL(formValues.template_file)} 
-                      alt="Preview" 
-                      className="w-16 h-12 rounded-lg object-cover p-0 border border-gray-100 shadow-sm bg-white" 
-                    />
-                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
-                      {typeof formValues.template_file === 'string' ? 'Current Template Image' : 'New Image Selected'}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
+          {/* Left Column - Form */}
+          <section className="w-full lg:w-[600px] xl:w-[700px] p-8 lg:p-10 border-r border-gray-100 overflow-y-auto bg-white flex flex-col gap-10 pb-24">
             
-            <h3 className="text-[11px] font-black tracking-widest text-blue-600 uppercase mb-6 pb-3 border-b border-gray-100 m-0">CERTIFICATE CONTENT</h3>
-            <div className="flex flex-col gap-6 mb-10">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Field label="Sub-heading (subTitle)" value={formValues.subTitle} onChange={(v) => setFormValues(f => ({...f, subTitle: v}))} full />
-                <Field label="Primary Design Color" value={formValues.primaryColor} onChange={(v) => setFormValues(f => ({...f, primaryColor: v}))} placeholder="e.g. Forest Green or #2E8B57" full />
+            {/* Section 1 */}
+            <div>
+              <h3 className="text-[12px] font-black tracking-widest text-gray-400 uppercase mb-6 m-0 border-b border-gray-50 pb-2">TEMPLATE CONFIGURATION</h3>
+              <div className="flex flex-col gap-6">
+                <Field label="TEMPLATE NAME *" placeholder="e.g. Summer Campaign 2024" value={formValues.name} onChange={(v) => setFormValues(f => ({...f, name: v}))} full />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Field label="ISSUE CATEGORY *" type="select" options={['Occasion', 'Carbon Offset', 'IPL Dot Ball', 'Support Team', 'Plantation']} value={formValues.category} onChange={(v) => setFormValues(f => ({...f, category: v}))} />
+                  <Field label="PRIMARY DESIGN COLOR *" type="select" options={['Forest Green (Eco)', 'Ocean Blue', 'Sunset Orange', 'Royal Purple', 'Slate Grey']} value={formValues.primaryColor} onChange={(v) => setFormValues(f => ({...f, primaryColor: v}))} />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Field label="WATERMARK PATTERN" type="select" options={['Minimal White', 'Logo Fade', 'Geometric', 'None']} value={'Minimal White'} onChange={() => {}} />
+                </div>
               </div>
-              <Field label="Main Description (Supports Variables)" type="textarea" value={formValues.description} onChange={(v) => setFormValues(f => ({...f, description: v}))} full />
-              <Field label="Tagline (Footer)" value={formValues.tagline} onChange={(v) => setFormValues(f => ({...f, tagline: v}))} full />
             </div>
 
-            <div className="mb-10">
-              <h3 className="text-[11px] font-black tracking-widest text-gray-400 uppercase mb-2 m-0">AVAILABLE VARIABLES</h3>
-              <p className="text-[11px] italic font-medium text-gray-400 mb-6 pb-3 border-b border-gray-100 m-0">Use these variables in the description to dynamically inject data.</p>
-              <div className="grid grid-cols-2 gap-y-3 gap-x-4">
-                {['{{recipient}}', '{{qty}}', '{{site}}', '{{occasion}}', '{{tournament}}', '{{match}}', '{{issue_date}}', '{{event_date}}', '{{match_date}}', '{{date}}', '{{dot_balls}}'].map((variable) => (
-                  <span className="flex flex-col" key={variable}>
-                    <b className="text-[12px] font-bold text-gray-900">{variable}</b>
-                  </span>
-                ))}
+            {/* Section 2 */}
+            <div>
+              <h3 className="text-[12px] font-black tracking-widest text-gray-400 uppercase mb-6 m-0 border-b border-gray-50 pb-2">CERTIFICATE CONTENT (SUPPORTS VARIABLES)</h3>
+              <div className="flex flex-col gap-6">
+                <Field label="CERTIFICATE TITLE" value={formValues.title} onChange={(v) => setFormValues(f => ({...f, title: v}))} full />
+                <Field label="SUB-HEADING" value={formValues.subTitle} onChange={(v) => setFormValues(f => ({...f, subTitle: v}))} full />
+                <Field label="MAIN DESCRIPTION" type="textarea" value={formValues.description} onChange={(v) => setFormValues(f => ({...f, description: v}))} full />
+                <Field label="TAGLINE (FOOTER)" value={formValues.tagline} onChange={(v) => setFormValues(f => ({...f, tagline: v}))} full />
               </div>
             </div>
+
+            {/* Section 3 */}
+            <div>
+              <h3 className="text-[12px] font-black tracking-widest text-gray-400 uppercase mb-2 m-0">PREVIEW TOOLS (NOT SAVED)</h3>
+              <p className="text-[12px] italic text-gray-400 mb-6 m-0 border-b border-gray-50 pb-3">Change these values only to test how your template looks with real data.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Field label="TEST METRIC (QTY)" value="50" onChange={() => {}} />
+                <Field label="TEST SITE (SITE)" value="Amazon Restoration Site" onChange={() => {}} />
+                <Field label="TEST IMPACT (IMPACT)" value="0.5 Tons" onChange={() => {}} />
+              </div>
+            </div>
+
+            {/* Action Buttons fixed to bottom in mobile, inline in desktop */}
+            <div className="flex items-center gap-4 mt-4">
+              <button className="h-[46px] px-8 text-[12px] font-bold tracking-widest uppercase text-gray-600 bg-white border border-gray-200 rounded-full hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setDesignerOpen(false)} type="button">CANCEL</button>
+              <button className="h-[46px] px-8 text-[12px] font-bold tracking-widest uppercase text-white bg-pink-500 rounded-full hover:bg-pink-600 transition-colors cursor-pointer border-0 shadow-lg shadow-pink-500/20" onClick={saveTemplate} type="button" style={{backgroundColor: '#e83e8c'}}>SAVE TEMPLATE</button>
+            </div>
             
-            <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
-              <button className="min-h-[46px] px-6 text-[11px] font-bold tracking-widest uppercase text-gray-600 bg-white border border-gray-200 rounded-[13px] hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setDesignerOpen(false)} type="button">CANCEL</button>
-              <button className="min-h-[46px] px-8 text-[11px] font-bold tracking-widest uppercase text-white bg-blue rounded-[13px] hover:bg-indigo transition-colors cursor-pointer border-0 shadow-lg shadow-blue/20" onClick={saveTemplate} type="button">SAVE TEMPLATE</button>
-            </div>
           </section>
-          <aside className="w-full lg:w-[480px] xl:w-[540px] p-8 bg-slate-50 flex flex-col overflow-y-auto">
-            <h3 className="text-[11px] font-black tracking-widest text-gray-500 uppercase mb-6 m-0">DESIGNER INSIGHT PREVIEW</h3>
-            <div className="mb-8">
-              <CertificatePreview values={formValues} />
+
+          {/* Right Column - Preview & Info */}
+          <aside className="flex-1 bg-white p-8 lg:p-10 flex flex-col gap-6 overflow-y-auto">
+            <div>
+              <h3 className="text-[12px] font-black tracking-widest text-gray-400 uppercase mb-4 m-0">DESIGNER INSIGHT PREVIEW</h3>
+              <div className="w-full bg-white border border-gray-100 rounded-[20px] shadow-sm p-4 lg:p-8 flex items-center justify-center">
+                <div className="w-full max-w-[800px] aspect-[1.414/1] bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden" style={{ minHeight: '400px' }}>
+                  <CertificatePreview values={{
+                    ...formValues,
+                    primaryColor: formValues.primaryColor?.includes('Green') ? '#2E8B57' : 
+                                  formValues.primaryColor?.includes('Blue') ? '#0284c7' : 
+                                  formValues.primaryColor?.includes('Orange') ? '#ea580c' : 
+                                  formValues.primaryColor?.includes('Purple') ? '#7c3aed' : '#475569',
+                    description: formValues.description || "Marking the occasion of [Occasion Name], this certificate acknowledges your thoughtful contribution of planting {{qty}} trees under the {{site}} initiative.\n\nYour gesture celebrates the moment while nurturing a greener and more sustainable future."
+                  }} />
+                </div>
+              </div>
             </div>
+
+            <div className="border border-gray-100 rounded-[20px] bg-slate-50/50 p-6">
+              <h3 className="text-[13px] font-bold text-gray-500 uppercase flex items-center gap-2 mb-6 m-0">
+                <Icon name="star" size={16} /> AVAILABLE VARIABLES
+              </h3>
+              
+              <div className="grid grid-cols-2 gap-y-6 gap-x-4">
+                {[
+                  { tag: '{{recipient}}', desc: 'Full Name' },
+                  { tag: '{{qty}}', desc: 'Metric Value' },
+                  { tag: '{{site}}', desc: 'Site Name' },
+                  { tag: '{{occasion}}', desc: 'Occasion Name' },
+                  { tag: '{{tournament}}', desc: 'Tournament' },
+                  { tag: '{{match}}', desc: 'Match Name' },
+                  { tag: '{{issue_date}}', desc: 'Today (Issue Day)' },
+                  { tag: '{{event_date}}', desc: 'Plantation Day' },
+                  { tag: '{{match_date}}', desc: 'Match Day' },
+                  { tag: '{{date}}', desc: 'Same as Issue Date' },
+                  { tag: '{{dot_balls}}', desc: 'Dot Balls' },
+                ].map((variable) => (
+                  <div className="flex flex-col" key={variable.tag}>
+                    <b className="text-[14px] font-bold text-blue-600 mb-1">{variable.tag}</b>
+                    <span className="text-[12px] text-gray-400 font-medium">{variable.desc}</span>
+                  </div>
+                ))}
+              </div>
+              
+              <p className="text-[11px] italic text-gray-400 mt-6 pt-4 border-t border-gray-200">
+                * Use these tags in your description. The system will replace them with real user data automatically.
+              </p>
+            </div>
+
+            <div className="bg-slate-50 border border-slate-200 rounded-[16px] p-5 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-blue-500 shadow-sm border border-slate-200">
+                <Icon name="monitor" size={18} />
+              </div>
+              <p className="text-[13px] font-semibold text-gray-600 m-0 leading-tight">
+                Design once, issue millions. This template will automatically adapt to every user's details.
+              </p>
+            </div>
+            
           </aside>
         </div>
       </div>
