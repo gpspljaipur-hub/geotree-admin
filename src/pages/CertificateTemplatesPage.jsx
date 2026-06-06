@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Icon from '../components/Icon'
-import { CertificatePreview } from './CertificatesPage'
+import { CertificatePreview, generateCertificateHTML } from './CertificatesPage'
 import { Field, PageHeader } from '../components/ui'
 import { apiService } from '../config/apiService'
 import { API_CONFIG } from '../config/endpoints'
@@ -94,10 +94,19 @@ export default function CertificateTemplatesPage() {
         formData.append('template_file', formValues.template_file)
       }
       
-      // Always provide a fallback html_template to satisfy backend validation if required
-      if (!formValues.html_template) {
-        formData.append('html_template', '<div></div>')
-      }
+      // Generate HTML from form values and send it to the backend as the actual template layout
+      const generatedHtml = generateCertificateHTML({
+        title: formValues.title || 'Certificate Title',
+        subTitle: formValues.subTitle || 'Sub Heading',
+        description: formValues.description || 'Description',
+        tagline: formValues.tagline || 'Tagline',
+        primaryColor: formValues.primaryColor || '#d97706',
+        recipient: '{{recipient}}',
+        issueDate: '{{issue_date}}',
+        certId: '{{certificate_id}}'
+      });
+      
+      formData.append('html_template', generatedHtml);
 
       if (editingId) {
         await apiService.updateCertificateTemplate(formData)
@@ -179,7 +188,7 @@ export default function CertificateTemplatesPage() {
           <aside className="w-full lg:w-[480px] xl:w-[540px] p-8 bg-slate-50 flex flex-col overflow-y-auto">
             <h3 className="text-[11px] font-black tracking-widest text-gray-500 uppercase mb-6 m-0">DESIGNER INSIGHT PREVIEW</h3>
             <div className="mb-8">
-              <CertificatePreview />
+              <CertificatePreview values={formValues} />
             </div>
           </aside>
         </div>

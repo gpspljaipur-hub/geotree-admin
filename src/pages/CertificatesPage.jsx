@@ -5,8 +5,8 @@ import { apiService } from '../config/apiService'
 
 export default function CertificatesPage() {
   const [query, setQuery] = useState('')
-  const [createOpen, setCreateOpen] = useState(false)
-  const [editOpen, setEditOpen] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editingId, setEditingId] = useState(null)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [selectedCert, setSelectedCert] = useState(null)
   
@@ -18,15 +18,14 @@ export default function CertificatesPage() {
   const [users, setUsers] = useState([])
   const [usersLoading, setUsersLoading] = useState(false)
   
-  const [selectedUserStr, setSelectedUserStr] = useState('')
   const [plantations, setPlantations] = useState([])
   const [plantationsLoading, setPlantationsLoading] = useState(false)
-  const [selectedPlantationStr, setSelectedPlantationStr] = useState('')
-  const [categoryStr, setCategoryStr] = useState('Plantation (Standard)')
-
-  // For Edit Modal
-  const [editId, setEditId] = useState(null)
-  const [editCategoryStr, setEditCategoryStr] = useState('')
+  
+  const [formValues, setFormValues] = useState({
+    user_id: '',
+    plantation_id: '',
+    category: 'Plantation (Standard)'
+  })
 
   useEffect(() => {
     fetchData()
@@ -37,17 +36,12 @@ export default function CertificatesPage() {
   }, [])
 
   useEffect(() => {
-    if (selectedUserStr) {
-      const selectedUser = users.find(u => `${u.name || 'Unknown User'} - ${u.mobile || u.email || 'N/A'}` === selectedUserStr)
-      if (selectedUser && (selectedUser._id || selectedUser.id)) {
-        fetchUserPlantations(selectedUser._id || selectedUser.id)
-      } else {
-        setPlantations([])
-      }
+    if (formValues.user_id) {
+      fetchUserPlantations(formValues.user_id)
     } else {
       setPlantations([])
     }
-  }, [selectedUserStr])
+  }, [formValues.user_id])
 
   const fetchUsers = async () => {
     try {
@@ -86,7 +80,8 @@ export default function CertificatesPage() {
       }
 
       const mappedRows = dataList.map(item => ({
-        id: item.certificate_id || item._id,
+        id: item._id || item.id,
+        display_id: item.certificate_id || item._id,
         user: item.user_id?.name || item.user_name || "Unknown User",
         phone: item.user_id?.mobile || item.user_id?.email || item.user_mobile || "N/A",
         trees: `${item.trees_count || 1} Trees`,
@@ -104,7 +99,7 @@ export default function CertificatesPage() {
   }
 
   const filteredRows = useMemo(
-    () => rows.filter((row) => `${row.id} ${row.user} ${row.phone} ${row.site}`.toLowerCase().includes(query.toLowerCase())),
+    () => rows.filter((row) => `${row.display_id} ${row.user} ${row.phone} ${row.site}`.toLowerCase().includes(query.toLowerCase())),
     [query, rows]
   )
 
@@ -114,9 +109,24 @@ export default function CertificatesPage() {
   }
 
   const handleEdit = (row) => {
-    setEditId(row.id)
-    setEditCategoryStr(row.category)
-    setEditOpen(true)
+    setEditingId(row.id)
+    const item = row.original
+    setFormValues({
+      user_id: item.user_id?._id || item.user_id || item.user || '',
+      plantation_id: item.plantation_id?._id || item.plantation_id || '',
+      category: item.category || item.plantation_source || 'Plantation (Standard)'
+    })
+    setModalOpen(true)
+  }
+
+  const handleCreate = () => {
+    setEditingId(null)
+    setFormValues({
+      user_id: '',
+      plantation_id: '',
+      category: 'Plantation (Standard)'
+    })
+    setModalOpen(true)
   }
 
   const handleDelete = async (row) => {
@@ -131,45 +141,34 @@ export default function CertificatesPage() {
     }
   }
 
-  const saveCreate = async () => {
+  const saveRecord = async () => {
     try {
-      const selectedUser = users.find(u => `${u.name || 'Unknown User'} - ${u.mobile || u.email || 'N/A'}` === selectedUserStr)
-      const selectedPlantation = plantations.find(p => `${p.trees_count || p.plants?.[0]?.quantity || 1} Trees at ${p.site_name || 'Unknown Site'} (${new Date(p.date || p.createdAt).toLocaleDateString()})` === selectedPlantationStr)
-      
       const payload = {
-        user_id: selectedUser?._id || selectedUser?.id,
-        plantation_id: selectedPlantation?._id || selectedPlantation?.id,
-        category: categoryStr
+        user_id: formValues.user_id,
+        plantation_id: formValues.plantation_id,
+        category: formValues.category
       }
 
-      await apiService.addCertificate(payload)
-      setCreateOpen(false)
+      if (editingId) {
+        payload.id = editingId
+        await apiService.updateCertificate(payload)
+      } else {
+        await apiService.addCertificate(payload)
+      }
+      
+      setModalOpen(false)
       fetchData()
     } catch (err) {
-      console.error("Error generating certificate:", err)
-      alert("Failed to generate certificate. Please ensure all fields are correctly selected.")
+      console.error("Error saving certificate:", err)
+      alert("Failed to save certificate. Please ensure all fields are correctly selected.")
     }
   }
 
-  const saveEdit = async () => {
-    try {
-      await apiService.updateCertificate({
-        id: editId,
-        category: editCategoryStr
-      })
-      setEditOpen(false)
-      fetchData()
-    } catch (err) {
-      console.error("Error updating certificate:", err)
-      alert("Failed to update certificate")
-    }
-  }
-
-  const userOptions = useMemo(() => users.map(u => `${u.name || 'Unknown User'} - ${u.mobile || u.email || 'N/A'}`), [users])
-  const plantationOptions = useMemo(() => plantations.map(p => `${p.trees_count || p.plants?.[0]?.quantity || 1} Trees at ${p.site_name || 'Unknown Site'} (${new Date(p.date || p.createdAt).toLocaleDateString()})`), [plantations])
+  const userOptions = useMemo(() => users.map(u => ({ label: `${u.name || 'Unknown User'} - ${u.mobile || u.email || 'N/A'}`, value: u._id || u.id })), [users])
+  const plantationOptions = useMemo(() => plantations.map(p => ({ label: `${p.trees_count || p.plants?.[0]?.quantity || 1} Trees at ${p.site_name || 'Unknown Site'} (${new Date(p.date || p.createdAt).toLocaleDateString()})`, value: p._id || p.id })), [plantations])
 
   const columns = [
-    { key: 'id', label: 'CERTIFICATE ID', render: (row) => <strong className="text-[13px] font-bold text-gray-800">{row.id}</strong> },
+    { key: 'id', label: 'CERTIFICATE ID', render: (row) => <strong className="text-[13px] font-bold text-gray-800">{row.display_id}</strong> },
     { key: 'user', label: 'USER IDENTITY', render: (row) => <div className="flex flex-col"><strong className="text-[14px] font-bold text-gray-800">{row.user}</strong><small className="text-[12px] font-semibold text-gray-400 mt-0.5">{row.phone}</small></div> },
     { key: 'trees', label: 'TREES & SITE', render: (row) => <div className="flex flex-col"><strong className="text-[14px] font-bold text-gray-800">{row.trees}</strong><small className="text-[12px] font-semibold text-gray-400 mt-0.5">{row.site}</small></div> },
     { key: 'category', label: 'CATEGORY', render: (row) => <Badge>{row.category}</Badge> },
@@ -179,12 +178,7 @@ export default function CertificatesPage() {
   ]
   return (
     <>
-      <PageHeader title="Certificates" description="Manage and issue digital certificates for plantations and carbon credits." actionLabel="ADD CERTIFICATE" onAction={() => {
-        setSelectedUserStr('');
-        setSelectedPlantationStr('');
-        setCategoryStr('Plantation (Standard)');
-        setCreateOpen(true);
-      }} />
+      <PageHeader title="Certificates" description="Manage and issue digital certificates for plantations and carbon credits." actionLabel="ADD CERTIFICATE" onAction={handleCreate} />
       <TableCard>
         <SearchBar placeholder="Search by ID, User, or Site..." value={query} onChange={setQuery} showButton={true} />
         {loading ? (
@@ -197,20 +191,12 @@ export default function CertificatesPage() {
         )}
       </TableCard>
 
-      {createOpen && (
-        <Modal title="Register New Certificate" submitLabel="GENERATE CERTIFICATE" onClose={() => setCreateOpen(false)} onSubmit={saveCreate}>
+      {modalOpen && (
+        <Modal title={editingId ? "Update Certificate" : "Register New Certificate"} submitLabel={editingId ? "SAVE CHANGES" : "GENERATE CERTIFICATE"} onClose={() => setModalOpen(false)} onSubmit={saveRecord}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Field label="Select User" required type="select" options={userOptions} placeholder={usersLoading ? "Loading users..." : "Select User"} value={selectedUserStr} onChange={setSelectedUserStr} full />
-            <Field label="Select Plantation Order" required type="select" options={plantationOptions} placeholder={plantationsLoading ? "Loading plantations..." : (selectedUserStr ? "Select Plantation" : "Select User First")} value={selectedPlantationStr} onChange={setSelectedPlantationStr} full />
-            <Field label="Certificate Category" type="select" options={['Plantation (Standard)', 'Occasion / Event', 'Carbon Offset', 'IPL Dot Ball', 'Support Team']} value={categoryStr} onChange={setCategoryStr} full />
-          </div>
-        </Modal>
-      )}
-
-      {editOpen && (
-        <Modal title="Update Certificate" submitLabel="SAVE CHANGES" onClose={() => setEditOpen(false)} onSubmit={saveEdit}>
-          <div className="grid grid-cols-1 gap-6">
-            <Field label="Certificate Category" required type="select" options={['Plantation (Standard)', 'Occasion / Event', 'Carbon Offset', 'IPL Dot Ball', 'Support Team']} value={editCategoryStr} onChange={setEditCategoryStr} full />
+            <Field label="Select User" required type="select" options={userOptions} placeholder={usersLoading ? "Loading users..." : "Select User"} value={formValues.user_id} onChange={(val) => setFormValues(prev => ({...prev, user_id: val}))} full />
+            <Field label="Select Plantation Order" required type="select" options={plantationOptions} placeholder={plantationsLoading ? "Loading plantations..." : (formValues.user_id ? "Select Plantation" : "Select User First")} value={formValues.plantation_id} onChange={(val) => setFormValues(prev => ({...prev, plantation_id: val}))} full />
+            <Field label="Certificate Category" type="select" options={['Plantation (Standard)', 'Occasion / Event', 'Carbon Offset', 'IPL Dot Ball', 'Support Team']} value={formValues.category} onChange={(val) => setFormValues(prev => ({...prev, category: val}))} full />
           </div>
         </Modal>
       )}
@@ -223,7 +209,7 @@ export default function CertificatesPage() {
               <button className="p-2 border-0 bg-transparent text-gray-400 hover:text-gray-900 cursor-pointer" onClick={() => setPreviewOpen(false)} type="button"><Icon name="x" size={24} /></button>
             </header>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-              <Badge tone="pink">{selectedCert.id}</Badge>
+              <Badge tone="pink">{selectedCert.display_id}</Badge>
               <div className="flex items-center gap-3">
                 <button className="min-h-[40px] px-5 text-[10px] font-bold tracking-widest text-gray-600 bg-white border border-gray-200 rounded-[10px] hover:bg-gray-50 transition-colors cursor-pointer uppercase" type="button">NEW TAB</button>
                 <button className="min-h-[40px] px-5 text-[10px] font-bold tracking-widest text-gray-600 bg-white border border-gray-200 rounded-[10px] hover:bg-gray-50 transition-colors cursor-pointer uppercase" type="button">PRINT</button>
@@ -238,28 +224,67 @@ export default function CertificatesPage() {
   )
 }
 
-export function CertificatePreview({ purple = false }) {
-  return (
-    <div className={`relative w-full aspect-[1.414] min-h-[400px] rounded-[12px] p-6 sm:p-10 flex flex-col justify-between overflow-hidden shadow-sm border ${purple ? 'border-purple-200 bg-gradient-to-br from-purple-50 to-white' : 'border-emerald-200 bg-gradient-to-br from-emerald-50 to-white'}`}>
-      <div className={`absolute top-4 left-4 w-[120px] h-[120px] border-t-2 border-l-2 opacity-30 ${purple ? 'border-purple-400' : 'border-emerald-400'}`} />
-      <div className={`absolute top-4 right-4 w-[120px] h-[120px] border-t-2 border-r-2 opacity-30 ${purple ? 'border-purple-400' : 'border-emerald-400'}`} />
-      <div className={`absolute bottom-4 left-4 w-[120px] h-[120px] border-b-2 border-l-2 opacity-30 ${purple ? 'border-purple-400' : 'border-emerald-400'}`} />
-      <div className={`absolute bottom-4 right-4 w-[120px] h-[120px] border-b-2 border-r-2 opacity-30 ${purple ? 'border-purple-400' : 'border-emerald-400'}`} />
-      
-      <div className="flex justify-between items-start text-[8px] sm:text-[10px] font-bold tracking-widest text-gray-500 relative z-10">
-        <span className="flex items-center gap-1.5 text-[14px] font-black tracking-tighter text-gray-900 uppercase">GeoTree</span>
-        <span className="text-right leading-relaxed">ISSUED DATE: &nbsp; 6/2/2026<br />CERTIFICATE ID: &nbsp; GT-2026-0001</span>
-      </div>
-      
-      <div className="flex-1 flex flex-col items-center justify-center text-center px-4 relative z-10 mt-6">
-        <span className={`w-14 h-14 rounded-full flex items-center justify-center text-[18px] font-black text-white shadow-lg mb-6 ${purple ? 'bg-purple-600 shadow-purple-600/30' : 'bg-emerald-600 shadow-emerald-600/30'}`}>GT</span>
-        <h3 className={`text-[20px] sm:text-[28px] font-black tracking-wide uppercase m-0 mb-2 ${purple ? 'text-purple-900' : 'text-emerald-900'}`}>{purple ? 'GREEN DOT BALL HERO' : 'CERTIFICATE OF APPRECIATION'}</h3>
-        <h4 className={`text-[12px] sm:text-[14px] font-[850] tracking-[4px] uppercase m-0 mb-8 opacity-70 ${purple ? 'text-purple-800' : 'text-emerald-800'}`}>{purple ? 'SUSTAINABILITY CHAMPION' : 'SPECIAL RECOGNITION'}</h4>
-        <em className="font-serif text-[14px] sm:text-[16px] text-gray-600 mb-2 not-italic">This is proudly presented to</em>
-        <strong className={`text-[32px] sm:text-[42px] font-black tracking-tight mb-6 ${purple ? 'text-purple-700' : 'text-emerald-700'}`}>John Doe</strong>
-        <p className="max-w-[80%] text-[11px] sm:text-[13px] leading-[1.8] text-gray-700 m-0 mb-10 font-medium">{purple ? 'In recognition of your performance, 50 trees have been planted at Thar Desert Restoration on behalf of John Doe. Every dot ball makes the world a little greener.' : 'Marking this special occasion, this certificate acknowledges your thoughtful contribution of planting 50 trees under the Amazon Restoration Site initiative.'}</p>
-        <b className="text-[10px] sm:text-[12px] font-bold tracking-widest uppercase text-gray-400 border-t border-gray-200/50 pt-4 w-[60%]">Nurturing a greener and more sustainable future</b>
+export const generateCertificateHTML = (values = {}) => {
+  const color = values.primaryColor || '#d97706';
+  const title = values.title || 'ENVIRONMENTAL IMPACT AWARD';
+  const subTitle = values.subTitle || 'TEAM CONTRIBUTION RECOGNITION';
+  const recipient = values.recipient || 'John Doe';
+  const description = values.description || 'Thank you John Doe for your incredible support. By helping us manage the plantation of 50 trees at Thar Desert Restoration, you are a vital part of our mission.';
+  const tagline = values.tagline || 'Nurturing a greener and more sustainable future';
+  const issueDate = values.issueDate || '6/6/2026';
+  const certId = values.certId || '6a1ea5388ce00f39550881c8';
+
+  return `
+    <div style="width: 100%; height: 100%; min-height: 480px; padding: 10px; background: #fdfdfd; box-sizing: border-box; font-family: sans-serif;">
+      <div style="border: 3px solid ${color}; height: 100%; width: 100%; box-sizing: border-box; padding: 5px;">
+        <div style="position: relative; border: 1px solid ${color}; height: 100%; box-sizing: border-box; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: #fff;">
+          
+          <!-- corners -->
+          <div style="position: absolute; top: 15px; left: 15px; width: 40px; height: 40px; border-top: 1px solid ${color}; border-left: 1px solid ${color};"></div>
+          <div style="position: absolute; top: 15px; right: 15px; width: 40px; height: 40px; border-top: 1px solid ${color}; border-right: 1px solid ${color};"></div>
+          <div style="position: absolute; bottom: 15px; left: 15px; width: 40px; height: 40px; border-bottom: 1px solid ${color}; border-left: 1px solid ${color};"></div>
+          <div style="position: absolute; bottom: 15px; right: 15px; width: 40px; height: 40px; border-bottom: 1px solid ${color}; border-right: 1px solid ${color};"></div>
+
+          <!-- Header -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; margin-bottom: 30px;">
+             <div style="font-size:20px; font-weight:900; color:#2c3e50; letter-spacing:-1px;">
+               <span style="color:#27ae60;">Geo</span><span style="color:#2c3e50;">Tree</span>
+             </div>
+             <div style="width: 34px; height: 34px; border-radius: 50%; border: 3px solid #8cc63f; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; transform: rotate(-15deg);">
+                <div style="width: 2px; height: 100%; background: #3498db; position: absolute; transform: rotate(45deg);"></div>
+                <div style="width: 100%; height: 2px; background: #3498db; position: absolute; transform: rotate(45deg);"></div>
+                <div style="color: #8cc63f; font-weight: 900; font-size: 22px; position: relative; z-index: 10;">G</div>
+             </div>
+             <div style="text-align: right; font-family: sans-serif; font-size: 9px; color: #95a5a6; font-weight: bold; line-height: 1.6; letter-spacing: 1px;">
+               ISSUED DATE: <span style="color: #2c3e50;">${issueDate}</span><br/>
+               CERTIFICATE ID: <span style="color: #2c3e50;">${certId}</span>
+             </div>
+          </div>
+
+          <!-- Content -->
+          <h1 style="font-family: Georgia, serif; font-size: 28px; color: #1a252f; letter-spacing: 3px; text-transform: uppercase; margin: 0 0 8px 0; max-width: 90%; line-height: 1.2;">${title}</h1>
+          <h2 style="font-family: sans-serif; font-size: 11px; color: #7f8c8d; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 25px 0;">${subTitle}</h2>
+
+          <p style="font-family: Georgia, serif; font-size: 15px; font-style: italic; color: #5a6672; margin: 0 0 8px 0;">This is proudly presented to</p>
+          <div style="display: inline-block; border-bottom: 2px solid ${color}; padding-bottom: 2px; margin-bottom: 20px;">
+            <h3 style="font-family: Georgia, serif; font-size: 34px; color: #0f172a; margin: 0; font-weight: bold;">${recipient}</h3>
+          </div>
+
+          <p style="font-family: sans-serif; font-size: 13px; color: #475569; line-height: 1.6; max-width: 85%; margin: 0 auto 25px auto;">${description}</p>
+
+          <p style="font-family: sans-serif; font-size: 13px; font-weight: bold; font-style: italic; color: #4c82b4; margin: 0;">${tagline}</p>
+          <div style="width: 120px; height: 1px; background: #cbd5e1; margin-top: 15px;"></div>
+        </div>
       </div>
     </div>
+  `;
+}
+
+export function CertificatePreview({ values = {} }) {
+  return (
+    <div 
+      className="w-full flex-1 min-h-[400px] flex items-center justify-center rounded-[12px] overflow-hidden shadow-sm border border-gray-100 bg-white"
+      dangerouslySetInnerHTML={{ __html: generateCertificateHTML(values) }}
+    />
   )
 }
