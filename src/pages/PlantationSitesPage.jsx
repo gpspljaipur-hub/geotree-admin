@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from 'react'
 import { Actions, Badge, DataTable, EntityCell, Field, Modal, PageHeader, SearchBar, StatusToggle, TableCard, Pagination } from '../components/ui'
 import { apiService } from '../config/apiService'
+import { API_CONFIG } from '../config/endpoints'
 
 export default function PlantationSitesPage() {
   const [query, setQuery] = useState('')
@@ -25,7 +26,9 @@ export default function PlantationSitesPage() {
     try {
       const res = await apiService.getStatesLocation()
       const data = res?.data?.data || res?.data || []
-      const formatted = data.map(s => typeof s === 'string' ? s : (s.state_name || s.name || s._id || s.id || String(s)))
+      const formatted = data.map(s => typeof s === 'string' 
+        ? { label: s, value: s } 
+        : { label: s.state_name || s.name || String(s), value: s._id || s.id || String(s) })
       setStatesList(formatted)
     } catch (err) {
       console.error("Error fetching states:", err)
@@ -65,37 +68,106 @@ export default function PlantationSitesPage() {
   }
 
   const filteredRows = useMemo(
-    () => rows.filter((row) => row.values.join(' ').toLowerCase().includes(query.toLowerCase())),
+    () => rows.filter((row) => (row.original.site_name || '').toLowerCase().includes(query.toLowerCase())),
     [query, rows],
   )
 
   const openCreate = () => {
     setEditingId(null)
-    setFormValues({})
+    setFormValues({
+      0: '',
+      1: '',
+      2: '',
+      3: '',
+      4: '',
+      5: '',
+      6: 'Miyawaki',
+      7: '',
+      8: '',
+      9: '',
+      10: '',
+      11: 'Active'
+    })
     setModalOpen(true)
   }
 
   const openEdit = (row) => {
     setEditingId(row.id)
-    const initialValues = {}
-    row.values.slice(0, 4).forEach((val, i) => {
-      initialValues[i] = val || ''
+    setFormValues({
+      0: row.original.site_name || '',
+      1: row.original.state_id?._id || row.original.state_id?.id || row.original.state_id || '',
+      2: row.original.district || '',
+      3: row.original.block || '',
+      4: row.original.gram_panchayat || '',
+      5: row.original.village || '',
+      6: row.original.plantation_type || 'Miyawaki',
+      7: row.original.capacity || '',
+      8: row.original.area || row.original.area_in_ha || '',
+      9: row.original.site_image ? `${API_CONFIG.IMAGE_URL}${row.original.site_image}` : '',
+      10: row.original.description || '',
+      11: row.original.status !== false ? 'Active' : 'Inactive'
     })
-    setFormValues(initialValues)
     setModalOpen(true)
   }
 
-  const saveRecord = () => {
-    const nextValues = []
-    for (let i = 0; i < 4; i++) {
-      nextValues.push(formValues[i] || (i === 0 ? 'New Plantation Site' : '—'))
+  const saveRecord = async () => {
+    try {
+      const formData = new FormData()
+      if (editingId) formData.append('id', editingId)
+      formData.append('site_name', formValues[0] || 'Unnamed Site')
+      formData.append('state_id', formValues[1] || '')
+      formData.append('district', formValues[2] || '')
+      formData.append('block', formValues[3] || '')
+      formData.append('gram_panchayat', formValues[4] || '')
+      formData.append('village', formValues[5] || '')
+      formData.append('plantation_type', formValues[6] || 'Miyawaki')
+      formData.append('capacity', formValues[7] || '0')
+      formData.append('area_in_ha', formValues[8] || '0')
+      formData.append('description', formValues[10] || '')
+      formData.append('status', String(formValues[11] === 'Active'))
+
+      if (formValues[9] && typeof formValues[9] === 'object') {
+        formData.append('site_image', formValues[9])
+      }
+
+      if (editingId) {
+        await apiService.updatePlantationSite(formData)
+      } else {
+        await apiService.addPlantationSite(formData)
+      }
+
+      setModalOpen(false)
+      fetchSites()
+    } catch (err) {
+      console.error("Error saving plantation site:", err)
+      alert("Failed to save plantation site.")
     }
-    if (editingId) {
-      setRows((current) => current.map((row) => row.id === editingId ? { ...row, values: nextValues } : row))
-    } else {
-      setRows((current) => [...current, { id: 'PlantationSitesPage-' + Date.now(), values: nextValues }])
+  }
+
+  const handleDelete = async (row) => {
+    if (window.confirm("Are you sure you want to delete this plantation site?")) {
+      try {
+        await apiService.deletePlantationSite({ id: row.id })
+        fetchSites()
+      } catch (err) {
+        console.error("Error deleting plantation site:", err)
+        alert("Failed to delete plantation site.")
+      }
     }
-    setModalOpen(false)
+  }
+
+  const handleStatusChange = async (row, newStatus) => {
+    try {
+      const formData = new FormData()
+      formData.append('id', row.id)
+      formData.append('status', String(newStatus))
+      await apiService.updatePlantationSite(formData)
+      setRows((current) => current.map(r => r.id === row.id ? { ...r, original: { ...r.original, status: newStatus } } : r))
+    } catch (err) {
+      console.error("Error updating status:", err)
+      alert("Failed to update status.")
+      fetchSites()
+    }
   }
 
   const columns = [
@@ -109,7 +181,8 @@ export default function PlantationSitesPage() {
         return (
           <EntityCell 
             title={row.original.site_name || 'Unnamed Site'} 
-            subtitle={locationText ? `, ${locationText}` : ''} 
+            subtitle={locationText ? `, ${locationText}` : ''}
+            image={row.original.site_image ? `${API_CONFIG.IMAGE_URL}${row.original.site_image}` : null}
           />
         )
       } 
@@ -132,7 +205,7 @@ export default function PlantationSitesPage() {
       render: (row) => (
         <div className="flex flex-col gap-1">
           <span className="text-[12px] font-black text-blue-700 flex items-center gap-1">
-            <span className="text-blue-500">📍</span> {row.original.area || row.original.area_in_ha || '—'}
+            <span className="text-blue-500">📍</span> {row.original.area || row.original.area_in_ha || '—'} HA
           </span>
           <span className="text-[10px] font-mono text-gray-400">
             {row.original.latitude && row.original.longitude ? `${row.original.latitude}, ${row.original.longitude}` : '—'}
@@ -140,14 +213,14 @@ export default function PlantationSitesPage() {
         </div>
       ) 
     },
-    { key: 'col-3', label: 'Status', render: () => <StatusToggle /> },
+    { key: 'col-3', label: 'Status', render: (row) => <StatusToggle active={row.original.status !== false} onChange={(newStatus) => handleStatusChange(row, newStatus)} /> },
     {
       key: 'col-4',
       label: 'Actions',
       render: (row) => (
         <Actions
           onEdit={() => openEdit(row)}
-          onDelete={() => setRows((current) => current.filter((item) => item.id !== row.id))}
+          onDelete={() => handleDelete(row)}
         />
       ),
     }
@@ -177,15 +250,32 @@ export default function PlantationSitesPage() {
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Field label="Site Name" required placeholder="e.g. Green Valley Site A" value={formValues[0]} onChange={(val) => setFormValues(c => ({...c, [0]: val}))} />
-            <Field label="State" required type="select" options={statesList.length > 0 ? statesList : ['Loading...']} value={formValues[1]} onChange={(val) => setFormValues(c => ({...c, [1]: val}))} />
-            <Field label="District" required type="select" options={['Chandigarh', 'Bhavnagar', 'Gadchiroli', 'Jaipur']} value={formValues[2]} onChange={(val) => setFormValues(c => ({...c, [2]: val}))} />
+            <Field label="State" required type="select" options={statesList.length > 0 ? statesList : [{ label: 'Loading...', value: '' }]} value={formValues[1]} onChange={(val) => setFormValues(c => ({...c, [1]: val}))} />
+            <Field label="District" required type="select" options={['Chandigarh', 'Bhavnagar', 'Gadchiroli', 'Jaipur', 'Goa']} value={formValues[2]} onChange={(val) => setFormValues(c => ({...c, [2]: val}))} />
             <Field label="Block" placeholder="e.g. Mulshi" value={formValues[3]} onChange={(val) => setFormValues(c => ({...c, [3]: val}))} />
             <Field label="Gram Panchayat" placeholder="e.g. Hinjavadi" value={formValues[4]} onChange={(val) => setFormValues(c => ({...c, [4]: val}))} />
             <Field label="Village" placeholder="e.g. Hinjavadi Site 1" value={formValues[5]} onChange={(val) => setFormValues(c => ({...c, [5]: val}))} />
-            <Field label="Plantation Type" type="select" options={['Miyawaki', 'Block Plantation']} value={formValues[6]} onChange={(val) => setFormValues(c => ({...c, [6]: val}))} />
+            <Field label="Plantation Type" type="select" options={['Miyawaki', 'Block Plantation', 'Agroforestry']} value={formValues[6]} onChange={(val) => setFormValues(c => ({...c, [6]: val}))} />
             <Field label="Capacity" placeholder="Total Capacity" value={formValues[7]} onChange={(val) => setFormValues(c => ({...c, [7]: val}))} />
             <Field label="Area (in HA)" placeholder="e.g. 2.5" value={formValues[8]} onChange={(val) => setFormValues(c => ({...c, [8]: val}))} />
-            <Field label="Site Image URL" type="file" value={formValues[9]} onChange={(val) => setFormValues(c => ({...c, [9]: val}))} />
+            <Field label="Status" type="select" options={['Active', 'Inactive']} value={formValues[11]} onChange={(val) => setFormValues(c => ({...c, [11]: val}))} />
+            
+            <div className="flex flex-col gap-2 md:col-span-2">
+              <Field label="Site Image URL (Optional on Edit)" type="file" full onChange={(val) => setFormValues(c => ({...c, [9]: val}))} />
+              {formValues[9] && (
+                <div className="flex items-center gap-3 mt-1 p-2 bg-gray-50 rounded-xl border border-gray-100 w-max pr-4">
+                  <img 
+                    src={typeof formValues[9] === 'string' ? formValues[9] : URL.createObjectURL(formValues[9])} 
+                    alt="Preview" 
+                    className="w-10 h-10 rounded-lg object-contain p-1 border border-gray-100 shadow-sm bg-white" 
+                  />
+                  <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+                    {typeof formValues[9] === 'string' ? 'Current Image' : 'New Image Selected'}
+                  </span>
+                </div>
+              )}
+            </div>
+
             <Field label="Description" type="textarea" placeholder="Optional details..." full value={formValues[10]} onChange={(val) => setFormValues(c => ({...c, [10]: val}))} />
           </div>
         </Modal>

@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from 'react'
-import { Actions, Badge, DataTable, EntityCell, Field, Modal, PageHeader, SearchBar, StatusToggle, TableCard , Pagination } from '../components/ui'
+import { Actions, Badge, DataTable, EntityCell, Field, Modal, PageHeader, SearchBar, StatusToggle, TableCard, Pagination } from '../components/ui'
 import { apiService } from '../config/apiService'
+import { API_CONFIG } from '../config/endpoints'
 
 export default function SpeciesPage() {
   const [query, setQuery] = useState('')
@@ -37,7 +38,7 @@ export default function SpeciesPage() {
       }))
       setRows(mappedRows)
     } catch (err) {
-      console.error("Error fetching:", err)
+      console.error("Error fetching species:", err)
     } finally {
       setLoading(false)
     }
@@ -46,7 +47,7 @@ export default function SpeciesPage() {
   const [newVariation, setNewVariation] = useState({ height: '', price: '' })
 
   const filteredRows = useMemo(
-    () => rows.filter((row) => row.values.join(' ').toLowerCase().includes(query.toLowerCase())),
+    () => rows.filter((row) => (row.original.name || row.original.species_name || '').toLowerCase().includes(query.toLowerCase())),
     [query, rows],
   )
 
@@ -65,7 +66,7 @@ export default function SpeciesPage() {
       scientific_name: st.scientific_name || '',
       co2_absorption: st.co2_absorption || '',
       maturity_period: st.maturity_period || '',
-      image: '',
+      image: st.species_image ? `${API_CONFIG.IMAGE_URL}${st.species_image}` : '',
       status: st.status !== false ? 'Active' : 'Inactive',
       description: st.description || '',
       variations: st.variations || []
@@ -74,32 +75,64 @@ export default function SpeciesPage() {
     setModalOpen(true)
   }
 
-  const saveRecord = () => {
-    // In a real scenario, this is where we'd hit apiService.addSpecies or updateSpecies
-    const nextValues = [
-      formValues.name || 'New Specie',
-      formValues.scientific_name || '',
-      formValues.co2_absorption || '',
-      formValues.maturity_period || ''
-    ]
-    
-    // We would also update original data to include variations locally
-    const stData = {
-      name: formValues.name,
-      scientific_name: formValues.scientific_name,
-      co2_absorption: formValues.co2_absorption,
-      maturity_period: formValues.maturity_period,
-      status: formValues.status === 'Active',
-      description: formValues.description,
-      variations: formValues.variations
-    }
+  const saveRecord = async () => {
+    try {
+      const formData = new FormData()
+      if (editingId) formData.append('id', editingId)
+      
+      formData.append('name', formValues.name || 'New Species')
+      formData.append('scientific_name', formValues.scientific_name || '')
+      formData.append('co2_absorption', formValues.co2_absorption || '0')
+      formData.append('maturity_period', formValues.maturity_period || '')
+      formData.append('description', formValues.description || '')
+      formData.append('status', String(formValues.status === 'Active'))
+      
+      // Variations array
+      const variations = formValues.variations || []
+      formData.append('variations', JSON.stringify(variations))
 
-    if (editingId) {
-      setRows((current) => current.map((row) => row.id === editingId ? { ...row, values: nextValues, original: { ...row.original, ...stData } } : row))
-    } else {
-      setRows((current) => [...current, { id: 'SpeciesPage-' + Date.now(), values: nextValues, original: stData }])
+      if (formValues.image && typeof formValues.image === 'object') {
+        formData.append('image', formValues.image)
+      }
+
+      if (editingId) {
+        await apiService.updateSpecies(formData)
+      } else {
+        await apiService.addSpecies(formData)
+      }
+
+      setModalOpen(false)
+      fetchData()
+    } catch (err) {
+      console.error("Error saving species:", err)
+      alert("Failed to save species.")
     }
-    setModalOpen(false)
+  }
+
+  const handleDelete = async (row) => {
+    if (window.confirm("Are you sure you want to delete this species?")) {
+      try {
+        await apiService.deleteSpecies({ id: row.id })
+        fetchData()
+      } catch (err) {
+        console.error("Error deleting species:", err)
+        alert("Failed to delete species.")
+      }
+    }
+  }
+
+  const handleStatusChange = async (row, newStatus) => {
+    try {
+      const formData = new FormData()
+      formData.append('id', row.id)
+      formData.append('status', String(newStatus))
+      await apiService.updateSpecies(formData)
+      setRows((current) => current.map(r => r.id === row.id ? { ...r, original: { ...r.original, status: newStatus } } : r))
+    } catch (err) {
+      console.error("Error updating status:", err)
+      alert("Failed to update status.")
+      fetchData()
+    }
   }
 
   const addVariation = () => {
@@ -122,7 +155,13 @@ export default function SpeciesPage() {
     { 
       key: 'col-0', 
       label: 'SPECIES', 
-      render: (row) => <EntityCell title={row.original.name || row.original.species_name || 'Unnamed'} /> 
+      render: (row) => (
+        <EntityCell 
+          title={row.original.name || row.original.species_name || 'Unnamed'} 
+          subtitle={<span className="text-pink italic">{row.original.scientific_name || ''}</span>}
+          image={row.original.species_image ? `${API_CONFIG.IMAGE_URL}${row.original.species_image}` : null}
+        /> 
+      )
     },
     { 
       key: 'col-1', 
@@ -155,14 +194,14 @@ export default function SpeciesPage() {
         )
       } 
     },
-    { key: 'col-3', label: 'STATUS', render: (row) => <StatusToggle active={row.original.status !== false} /> },
+    { key: 'col-3', label: 'STATUS', render: (row) => <StatusToggle active={row.original.status !== false} onChange={(newStatus) => handleStatusChange(row, newStatus)} /> },
     {
       key: 'col-4',
       label: 'ACTIONS',
       render: (row) => (
         <Actions
           onEdit={() => openEdit(row)}
-          onDelete={() => setRows((current) => current.filter((item) => item.id !== row.id))}
+          onDelete={() => handleDelete(row)}
         />
       ),
     }
@@ -184,7 +223,7 @@ export default function SpeciesPage() {
       </TableCard>
       {modalOpen && (
         <Modal
-          title={editingId ? 'Edit Specie' : 'Register New Species'}
+          title={editingId ? 'Edit Species' : 'Register New Species'}
           submitLabel={editingId ? 'SAVE CHANGES' : 'REGISTER SPECIES'}
           onClose={() => setModalOpen(false)}
           onSubmit={saveRecord}
@@ -195,8 +234,23 @@ export default function SpeciesPage() {
             <Field label="Scientific Name" placeholder="e.g. Azadirachta indica" value={formValues.scientific_name || ''} onChange={(val) => setFormValues(c => ({...c, scientific_name: val}))} />
             <Field label="Sequestration (KGS/YEAR)" placeholder="0" value={formValues.co2_absorption || ''} onChange={(val) => setFormValues(c => ({...c, co2_absorption: val}))} />
             <Field label="Maturity Period" placeholder="e.g. 10-15 Years" value={formValues.maturity_period || ''} onChange={(val) => setFormValues(c => ({...c, maturity_period: val}))} />
-            <Field label="Species Image Upload" type="file" full value={formValues.image || ''} onChange={(val) => setFormValues(c => ({...c, image: val}))} />
             
+            <div className="flex flex-col gap-2 md:col-span-2">
+              <Field label="Species Image Upload (Optional on Edit)" type="file" full onChange={(val) => setFormValues(c => ({...c, image: val}))} />
+              {formValues.image && (
+                <div className="flex items-center gap-3 mt-1 p-2 bg-gray-50 rounded-xl border border-gray-100 w-max pr-4">
+                  <img 
+                    src={typeof formValues.image === 'string' ? formValues.image : URL.createObjectURL(formValues.image)} 
+                    alt="Preview" 
+                    className="w-10 h-10 rounded-lg object-contain p-1 border border-gray-100 shadow-sm bg-white" 
+                  />
+                  <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+                    {typeof formValues.image === 'string' ? 'Current Image' : 'New Image Selected'}
+                  </span>
+                </div>
+              )}
+            </div>
+
             <div className="col-span-1 md:col-span-2">
               <label className="block text-[11px] font-[850] text-gray-700 uppercase tracking-wider mb-2">HEIGHT & PRICE</label>
               <div className="border border-gray-100 rounded-2xl p-6 bg-gray-50/50">

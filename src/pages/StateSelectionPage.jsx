@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from 'react'
 import { Actions, Badge, DataTable, EntityCell, Field, Modal, PageHeader, Pagination, SearchBar, StatusToggle, TableCard } from '../components/ui'
 import { apiService } from '../config/apiService'
+import { API_CONFIG } from '../config/endpoints'
 
 export default function StateSelectionPage() {
   const [query, setQuery] = useState('')
@@ -21,7 +22,6 @@ export default function StateSelectionPage() {
   const fetchStates = async () => {
     try {
       setLoading(true)
-      // Using limit: 10 so pagination is more apparent if there are many records
       const res = await apiService.getStates({ page, limit: 10 })
       
       const stateList = res?.data || []
@@ -32,10 +32,7 @@ export default function StateSelectionPage() {
       
       const mappedRows = stateList.map((st, index) => ({
         id: st._id || st.id || `StateSelectionPage-${index}`,
-        values: [
-          st.state_name || 'Unnamed State',
-          st.description || '—'
-        ],
+        values: [],
         original: st
       }))
       setRows(mappedRows)
@@ -47,50 +44,104 @@ export default function StateSelectionPage() {
   }
 
   const filteredRows = useMemo(
-    () => rows.filter((row) => row.values.join(' ').toLowerCase().includes(query.toLowerCase())),
+    () => rows.filter((row) => (row.original.state_name || '').toLowerCase().includes(query.toLowerCase())),
     [query, rows],
   )
 
   const openCreate = () => {
     setEditingId(null)
-    setFormValues({})
+    setFormValues({
+      0: '',
+      1: '',
+      2: 'Active',
+      3: ''
+    })
     setModalOpen(true)
   }
 
   const openEdit = (row) => {
     setEditingId(row.id)
-    const initialValues = {}
-    row.values.slice(0, 2).forEach((val, i) => {
-      initialValues[i] = val || ''
+    setFormValues({
+      0: row.original.state_name || '',
+      1: row.original.state_image ? `${API_CONFIG.IMAGE_URL}${row.original.state_image}` : '',
+      2: row.original.status !== false ? 'Active' : 'Inactive',
+      3: row.original.description || ''
     })
-    setFormValues(initialValues)
     setModalOpen(true)
   }
 
-  const saveRecord = () => {
-    const nextValues = []
-    for (let i = 0; i < 2; i++) {
-      nextValues.push(formValues[i] || (i === 0 ? 'New State Selection' : '—'))
+  const saveRecord = async () => {
+    try {
+      const formData = new FormData()
+      if (editingId) formData.append('id', editingId)
+      formData.append('state_name', formValues[0] || 'New State')
+      formData.append('description', formValues[3] || '')
+      formData.append('status', String(formValues[2] === 'Active'))
+      
+      if (formValues[1] && typeof formValues[1] === 'object') {
+        formData.append('state_image', formValues[1])
+      }
+
+      if (editingId) {
+        await apiService.updateState(formData)
+      } else {
+        await apiService.addState(formData)
+      }
+
+      setModalOpen(false)
+      fetchStates() // Refresh list
+    } catch (err) {
+      console.error("Error saving state:", err)
+      alert("Failed to save state.")
     }
-    if (editingId) {
-      setRows((current) => current.map((row) => row.id === editingId ? { ...row, values: nextValues } : row))
-    } else {
-      setRows((current) => [...current, { id: 'StateSelectionPage-' + Date.now(), values: nextValues }])
+  }
+
+  const handleDelete = async (row) => {
+    if (window.confirm("Are you sure you want to delete this state?")) {
+      try {
+        await apiService.deleteState({ id: row.id })
+        fetchStates()
+      } catch (err) {
+        console.error("Error deleting state:", err)
+        alert("Failed to delete state.")
+      }
     }
-    setModalOpen(false)
+  }
+
+  const handleStatusChange = async (row, newStatus) => {
+    try {
+      const formData = new FormData()
+      formData.append('id', row.id)
+      formData.append('status', String(newStatus))
+      await apiService.updateState(formData)
+      setRows((current) => current.map(r => r.id === row.id ? { ...r, original: { ...r.original, status: newStatus } } : r))
+    } catch (err) {
+      console.error("Error updating status:", err)
+      alert("Failed to update status.")
+      fetchStates()
+    }
   }
 
   const columns = [
-    { key: 'col-0', label: 'State Details', render: (row) => <EntityCell title={row.values[0]} /> },
-    { key: 'col-1', label: 'Region', render: (row) => <span>{row.values[Math.min(1, row.values.length - 1)] || '—'}</span> },
-    { key: 'col-2', label: 'Status', render: () => <StatusToggle /> },
+    { 
+      key: 'col-0', 
+      label: 'STATE', 
+      render: (row) => (
+        <EntityCell 
+          title={row.original.state_name || 'Unnamed State'} 
+          subtitle={<span className="text-pink text-xs">{row.original.description || ''}</span>}
+          image={row.original.state_image ? `${API_CONFIG.IMAGE_URL}${row.original.state_image}` : null}
+        />
+      ) 
+    },
+    { key: 'col-1', label: 'STATUS', render: (row) => <StatusToggle active={row.original.status !== false} onChange={(newStatus) => handleStatusChange(row, newStatus)} /> },
     {
-      key: 'col-3',
-      label: 'Actions',
+      key: 'col-2',
+      label: 'ACTIONS',
       render: (row) => (
         <Actions
           onEdit={() => openEdit(row)}
-          onDelete={() => setRows((current) => current.filter((item) => item.id !== row.id))}
+          onDelete={() => handleDelete(row)}
         />
       ),
     }
@@ -120,8 +171,24 @@ export default function StateSelectionPage() {
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Field label="State Name" required placeholder="e.g. Maharashtra" value={formValues[0]} onChange={(val) => setFormValues(c => ({...c, [0]: val}))} />
-            <Field label="Region Banner Upload" type="file" value={formValues[1]} onChange={(val) => setFormValues(c => ({...c, [1]: val}))} />
-            <Field label="Status" type="select" placeholder="Active" options={['Active', 'Inactive']} value={formValues[2]} onChange={(val) => setFormValues(c => ({...c, [2]: val}))} />
+            <Field label="Status" type="select" options={['Active', 'Inactive']} value={formValues[2]} onChange={(val) => setFormValues(c => ({...c, [2]: val}))} />
+            
+            <div className="flex flex-col gap-2 md:col-span-2">
+              <Field label="State Image Upload (Optional on Edit)" type="file" full onChange={(val) => setFormValues(c => ({...c, [1]: val}))} />
+              {formValues[1] && (
+                <div className="flex items-center gap-3 mt-1 p-2 bg-gray-50 rounded-xl border border-gray-100 w-max pr-4">
+                  <img 
+                    src={typeof formValues[1] === 'string' ? formValues[1] : URL.createObjectURL(formValues[1])} 
+                    alt="Preview" 
+                    className="w-10 h-10 rounded-lg object-contain p-1 border border-gray-100 shadow-sm bg-white" 
+                  />
+                  <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+                    {typeof formValues[1] === 'string' ? 'Current Image' : 'New Image Selected'}
+                  </span>
+                </div>
+              )}
+            </div>
+
             <Field label="Description" type="textarea" placeholder="Enter regional details..." full value={formValues[3]} onChange={(val) => setFormValues(c => ({...c, [3]: val}))} />
           </div>
         </Modal>

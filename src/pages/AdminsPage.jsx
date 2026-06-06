@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react'
 import Icon from '../components/Icon'
-import { Actions, Badge, DataTable, EntityCell, Field, Modal, PageHeader, SearchBar, StatusToggle, TableCard , Pagination } from '../components/ui'
+import { Actions, Badge, DataTable, EntityCell, Field, Modal, PageHeader, SearchBar, StatusToggle, TableCard, Pagination } from '../components/ui'
 import { apiService } from '../config/apiService'
 
 export default function AdminsPage() {
@@ -31,13 +31,14 @@ export default function AdminsPage() {
         values: [
           st.name || st.first_name || "Unnamed",
           st.email || "—",
-          st.role || "—"
+          st.role || "—",
+          st.status
         ],
         original: st
       }))
       setRows(mappedRows)
     } catch (err) {
-      console.error("Error fetching:", err)
+      console.error("Error fetching admins:", err)
     } finally {
       setLoading(false)
     }
@@ -50,31 +51,79 @@ export default function AdminsPage() {
 
   const openCreate = () => {
     setEditingId(null)
-    setFormValues({})
+    setFormValues({
+      0: '', // Name
+      2: '', // Email
+      3: '', // Password
+      4: 'admin', // Role (Backend uses 'admin'/'super admin' etc.)
+      5: 'Active' // Status
+    })
     setModalOpen(true)
   }
 
   const openEdit = (row) => {
     setEditingId(row.id)
-    const initialValues = {}
-    row.values.slice(0, 3).forEach((val, i) => {
-      initialValues[i] = val || ''
+    const st = row.original
+    setFormValues({
+      0: st.name || st.first_name || '',
+      2: st.email || '',
+      3: '', // Password usually left blank for update unless changing
+      4: st.role || 'admin',
+      5: st.status !== false ? 'Active' : 'Inactive'
     })
-    setFormValues(initialValues)
     setModalOpen(true)
   }
 
-  const saveRecord = () => {
-    const nextValues = []
-    for (let i = 0; i < 3; i++) {
-      nextValues.push(formValues[i] || (i === 0 ? 'New Admin' : '—'))
+  const saveRecord = async () => {
+    try {
+      const payload = {
+        name: formValues[0],
+        email: formValues[2],
+        role: formValues[4],
+        status: formValues[5] === 'Active'
+      }
+
+      // Only send password if provided
+      if (formValues[3]) {
+        payload.password = formValues[3]
+      }
+
+      if (editingId) {
+        payload.id = editingId
+        await apiService.updateAdmin(payload)
+      } else {
+        await apiService.addAdmin(payload)
+      }
+      
+      setModalOpen(false)
+      fetchData()
+    } catch (err) {
+      console.error("Error saving admin:", err)
+      alert("Failed to save admin.")
     }
-    if (editingId) {
-      setRows((current) => current.map((row) => row.id === editingId ? { ...row, values: nextValues } : row))
-    } else {
-      setRows((current) => [...current, { id: 'AdminsPage-' + Date.now(), values: nextValues }])
+  }
+
+  const handleDelete = async (row) => {
+    if (window.confirm("Are you sure you want to delete this admin?")) {
+      try {
+        await apiService.deleteAdmin({ id: row.id })
+        fetchData()
+      } catch (err) {
+        console.error("Error deleting admin:", err)
+        alert("Failed to delete admin.")
+      }
     }
-    setModalOpen(false)
+  }
+
+  const handleStatusChange = async (row, newStatus) => {
+    try {
+      await apiService.updateAdmin({ id: row.id, status: newStatus })
+      setRows((current) => current.map(r => r.id === row.id ? { ...r, original: { ...r.original, status: newStatus } } : r))
+    } catch (err) {
+      console.error("Error updating status:", err)
+      alert("Failed to update status.")
+      fetchData()
+    }
   }
 
   const columns = [
@@ -99,7 +148,7 @@ export default function AdminsPage() {
       } 
     },
     { key: 'col-1', label: 'EMAIL', render: (row) => <span className="text-[13px] text-gray-500 font-medium">{row.values[1] || '—'}</span> },
-    { key: 'col-2', label: 'APP STATUS', render: () => <StatusToggle active={true} /> },
+    { key: 'col-2', label: 'APP STATUS', render: (row) => <StatusToggle active={row.original.status !== false} onChange={(newStatus) => handleStatusChange(row, newStatus)} /> },
     {
       key: 'col-3',
       label: 'ACTIONS',
@@ -107,7 +156,7 @@ export default function AdminsPage() {
       render: (row) => (
         <Actions
           onEdit={() => openEdit(row)}
-          onDelete={() => setRows((current) => current.filter((item) => item.id !== row.id))}
+          onDelete={() => handleDelete(row)}
         />
       ),
     }
@@ -247,7 +296,7 @@ export default function AdminsPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2 text-[12px] font-medium text-gray-500">
-                <Icon name="info" size={14} /> Click a cell to toggle access (Super Admin is always full access)
+                 <Icon name="info" size={14} /> Click a cell to toggle access (Super Admin is always full access)
               </div>
             </div>
           </div>
@@ -262,12 +311,11 @@ export default function AdminsPage() {
           onSubmit={saveRecord}
           wide={false}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             <Field label="Admin Name" required placeholder="Full Name" value={formValues[0]} onChange={(val) => setFormValues(c => ({...c, [0]: val}))} />
-            <Field label="Profile Photo" type="file" value={formValues[1]} onChange={(val) => setFormValues(c => ({...c, [1]: val}))} />
             <Field label="Email ID" required type="email" placeholder="admin@geotree.com" value={formValues[2]} onChange={(val) => setFormValues(c => ({...c, [2]: val}))} />
-            <Field label="Password" type="password" placeholder="Password" value={formValues[3]} onChange={(val) => setFormValues(c => ({...c, [3]: val}))} />
-            <Field label="System Role" required type="select" options={['Super Admin', 'Finance Admin', 'Field Officer']} value={formValues[4]} onChange={(val) => setFormValues(c => ({...c, [4]: val}))} />
+            <Field label="Password" type="password" placeholder={editingId ? "Leave blank to keep unchanged" : "Password"} value={formValues[3]} onChange={(val) => setFormValues(c => ({...c, [3]: val}))} />
+            <Field label="System Role" required type="select" options={['admin', 'super admin', 'finance', 'field officer']} value={formValues[4]} onChange={(val) => setFormValues(c => ({...c, [4]: val}))} />
             <Field label="Status" type="select" options={['Active', 'Inactive']} value={formValues[5]} onChange={(val) => setFormValues(c => ({...c, [5]: val}))} />
           </div>
         </Modal>

@@ -2,10 +2,13 @@ import { useMemo, useState, useEffect } from 'react'
 import Icon from '../components/Icon'
 import { Actions, Badge, DataTable, Field, Modal, PageHeader, SearchBar, StatusToggle, TableCard, Pagination } from '../components/ui'
 import { apiService } from '../config/apiService'
+import { API_CONFIG } from '../config/endpoints'
 
 export default function MatchesPage() {
   const [query, setQuery] = useState('')
   const [rows, setRows] = useState([])
+  const [tournaments, setTournaments] = useState([])
+  const [teams, setTeams] = useState([])
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
@@ -22,9 +25,17 @@ export default function MatchesPage() {
   const fetchData = async () => {
     try {
       setLoading(true)
-      const res = await apiService.getMatches({ page, limit: 10 })
-      const dataList = res?.data?.data || res?.data || (Array.isArray(res) ? res : [])
+      const [res, toursRes, teamsRes] = await Promise.all([
+        apiService.getMatches({ page, limit: 10 }),
+        apiService.getTournaments({ page: 1, limit: 100 }),
+        apiService.getTeams({ page: 1, limit: 100 })
+      ])
+      
       if (res?.pagination) setTotalPages(res.pagination.pages || 1)
+      const dataList = res?.data?.data || res?.data || (Array.isArray(res) ? res : [])
+      
+      setTournaments(toursRes?.data?.data || toursRes?.data || [])
+      setTeams(teamsRes?.data?.data || teamsRes?.data || [])
       
       const mappedRows = dataList.map((st, index) => ({
         id: st._id || st.id || `MatchesPage-${index}`,
@@ -39,7 +50,7 @@ export default function MatchesPage() {
       }))
       setRows(mappedRows)
     } catch (err) {
-      console.error("Error fetching:", err)
+      console.error("Error fetching matches:", err)
     } finally {
       setLoading(false)
     }
@@ -52,23 +63,93 @@ export default function MatchesPage() {
 
   const openCreate = () => {
     setEditingId(null)
-    setFormValues({})
+    setFormValues({
+      0: tournaments.length > 0 ? tournaments[0]._id : '',
+      1: teams.length > 0 ? teams[0]._id : '',
+      2: teams.length > 1 ? teams[1]._id : '',
+      3: '',
+      4: 'Upcoming',
+      5: '',
+      6: '',
+      7: '0',
+      8: '0',
+      9: '0',
+      10: 'Active'
+    })
     setModalOpen(true)
   }
 
   const openEdit = (row) => {
     setEditingId(row.id)
-    const initialValues = {}
-    row.values.slice(0, 5).forEach((val, i) => {
-      initialValues[i] = val || ''
+    const st = row.original
+    setFormValues({
+      0: st.tournament_id?._id || st.tournament_id || (tournaments.length > 0 ? tournaments[0]._id : ''),
+      1: st.team1_id?._id || st.team1_id || (teams.length > 0 ? teams[0]._id : ''),
+      2: st.team2_id?._id || st.team2_id || (teams.length > 1 ? teams[1]._id : ''),
+      3: st.venue || '',
+      4: st.match_status || 'Upcoming',
+      5: st.match_date ? st.match_date.split('T')[0] : '',
+      6: st.match_time || '',
+      7: String(st.total_dot_balls || 0),
+      8: String(st.team1_dotball || st.team1_initial_dotball || 0),
+      9: String(st.team2_dotball || st.team2_initial_dotball || 0),
+      10: st.status !== false ? 'Active' : 'Inactive'
     })
-    setFormValues(initialValues)
     setModalOpen(true)
   }
 
-  const saveRecord = () => {
-    // Mock save
-    setModalOpen(false)
+  const saveRecord = async () => {
+    try {
+      const payload = {
+        tournament_id: formValues[0],
+        team1_id: formValues[1],
+        team2_id: formValues[2],
+        venue: formValues[3],
+        match_status: formValues[4],
+        match_date: formValues[5],
+        match_time: formValues[6],
+        match_type: "League", // Hardcoded for now based on postman examples
+        team1_dotball: Number(formValues[8]) || 0,
+        team2_dotball: Number(formValues[9]) || 0,
+        status: formValues[10] === 'Active'
+      }
+
+      if (editingId) {
+        payload.id = editingId
+        await apiService.updateMatch(payload)
+      } else {
+        await apiService.addMatch(payload)
+      }
+
+      setModalOpen(false)
+      fetchData()
+    } catch (err) {
+      console.error("Error saving match:", err)
+      alert("Failed to save match.")
+    }
+  }
+
+  const handleDelete = async (row) => {
+    if (window.confirm("Are you sure you want to delete this match?")) {
+      try {
+        await apiService.deleteMatch({ id: row.id })
+        fetchData()
+      } catch (err) {
+        console.error("Error deleting match:", err)
+        alert("Failed to delete match.")
+      }
+    }
+  }
+
+  const handleStatusChange = async (row, newStatus) => {
+    try {
+      await apiService.updateMatch({ id: row.id, status: newStatus })
+      setRows((current) => current.map(r => r.id === row.id ? { ...r, original: { ...r.original, status: newStatus } } : r))
+    } catch (err) {
+      console.error("Error updating status:", err)
+      alert("Failed to update status.")
+      fetchData()
+    }
   }
 
   const columns = [
@@ -80,14 +161,14 @@ export default function MatchesPage() {
           <div><span className="bg-pink-50 text-pink text-[9px] font-black px-2 py-1 rounded uppercase tracking-widest">{row.original.tournament_id?.short_name || '—'}</span></div>
           <div className="flex items-center gap-6 max-w-max">
             <div className="flex items-center gap-3 w-[100px]">
-              {row.original.team1_id?.team_logo ? <img src={`http://192.168.0.19:5030${row.original.team1_id.team_logo}`} className="w-10 h-10 rounded-lg object-contain bg-white border border-gray-100 p-1" alt={row.original.team1_id.team_short_name} /> : <div className="w-10 h-10 rounded-lg bg-gray-100 border border-gray-200" />}
+              {row.original.team1_id?.team_logo ? <img src={`${API_CONFIG.IMAGE_URL}${row.original.team1_id.team_logo}`} className="w-10 h-10 rounded-lg object-contain bg-white border border-gray-100 p-1" alt={row.original.team1_id.team_short_name} /> : <div className="w-10 h-10 rounded-lg bg-gray-100 border border-gray-200" />}
               <b className="text-[14px] font-black tracking-wider text-gray-900">{row.original.team1_id?.team_short_name || 'T1'}</b>
             </div>
             
             <span className="text-[9px] font-black text-pink bg-pink-50 w-6 h-6 flex items-center justify-center rounded-full shadow-sm">VS</span>
             
             <div className="flex items-center gap-3 w-[100px]">
-              {row.original.team2_id?.team_logo ? <img src={`http://192.168.0.19:5030${row.original.team2_id.team_logo}`} className="w-10 h-10 rounded-lg object-contain bg-white border border-gray-100 p-1" alt={row.original.team2_id.team_short_name} /> : <div className="w-10 h-10 rounded-lg bg-gray-100 border border-gray-200" />}
+              {row.original.team2_id?.team_logo ? <img src={`${API_CONFIG.IMAGE_URL}${row.original.team2_id.team_logo}`} className="w-10 h-10 rounded-lg object-contain bg-white border border-gray-100 p-1" alt={row.original.team2_id.team_short_name} /> : <div className="w-10 h-10 rounded-lg bg-gray-100 border border-gray-200" />}
               <b className="text-[14px] font-black tracking-wider text-gray-900">{row.original.team2_id?.team_short_name || 'T2'}</b>
             </div>
           </div>
@@ -160,7 +241,7 @@ export default function MatchesPage() {
         )
       }
     },
-    { key: 'col-4', label: 'STATUS', render: (row) => <StatusToggle active={row.original.status !== false} /> },
+    { key: 'col-4', label: 'STATUS', render: (row) => <StatusToggle active={row.original.status !== false} onChange={(newStatus) => handleStatusChange(row, newStatus)} /> },
     {
       key: 'col-5',
       label: 'ACTIONS',
@@ -168,11 +249,14 @@ export default function MatchesPage() {
       render: (row) => (
         <Actions
           onEdit={() => openEdit(row)}
-          onDelete={() => setRows((current) => current.filter((item) => item.id !== row.id))}
+          onDelete={() => handleDelete(row)}
         />
       ),
     }
   ]
+
+  const tournamentOptions = tournaments.map(t => ({ label: t.name, value: t._id }))
+  const teamOptions = teams.map(t => ({ label: t.team_name, value: t._id }))
 
   return (
     <>
@@ -191,21 +275,20 @@ export default function MatchesPage() {
       {modalOpen && (
         <Modal title={editingId ? "Edit Match" : "Register New Match"} submitLabel={editingId ? "SAVE CHANGES" : "REGISTER MATCH"} onClose={() => setModalOpen(false)} onSubmit={saveRecord}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Field label="Tournament" required type="select" placeholder="Select Tournament" options={['Indian Premier League']} value={formValues[0]} onChange={(val) => setFormValues(c => ({...c, [0]: val}))} />
-            <Field label="Team 1" required type="select" placeholder="Select Team 1" options={['RR', 'SRH', 'GT', 'MI']} value={formValues[1]} onChange={(val) => setFormValues(c => ({...c, [1]: val}))} />
+            <Field label="Tournament" required type="select" placeholder="Select Tournament" options={tournamentOptions} value={formValues[0]} onChange={(val) => setFormValues(c => ({...c, [0]: val}))} />
+            <Field label="Team 1" required type="select" placeholder="Select Team 1" options={teamOptions} value={formValues[1]} onChange={(val) => setFormValues(c => ({...c, [1]: val}))} />
             
-            <Field label="Team 2" required type="select" placeholder="Select Team 2" options={['RR', 'SRH', 'GT', 'MI']} value={formValues[2]} onChange={(val) => setFormValues(c => ({...c, [2]: val}))} />
+            <Field label="Team 2" required type="select" placeholder="Select Team 2" options={teamOptions} value={formValues[2]} onChange={(val) => setFormValues(c => ({...c, [2]: val}))} />
             <Field label="Match Date" required type="date" value={formValues[5]} onChange={(val) => setFormValues(c => ({...c, [5]: val}))} />
             
             <Field label="Match Time" required type="time" value={formValues[6]} onChange={(val) => setFormValues(c => ({...c, [6]: val}))} />
-            <Field label="Match Stage" type="select" options={['Upcoming', 'Live', 'Completed']} value={formValues[4]} onChange={(val) => setFormValues(c => ({...c, [4]: val}))} />
+            <Field label="Match Stage" type="select" options={['upcoming', 'live', 'completed']} value={formValues[4]} onChange={(val) => setFormValues(c => ({...c, [4]: val}))} />
             
             <Field label="Venue / Stadium" required placeholder="e.g. Wankhede Stadium" full value={formValues[3]} onChange={(val) => setFormValues(c => ({...c, [3]: val}))} />
             
-            <Field label="Match Dot Balls (Total)" value={formValues[7]} onChange={(val) => setFormValues(c => ({...c, [7]: val}))} />
-            <Field label="Team 1 Dot Balls" value={formValues[8]} onChange={(val) => setFormValues(c => ({...c, [8]: val}))} />
+            <Field label="Team 1 Dot Balls" type="number" value={formValues[8]} onChange={(val) => setFormValues(c => ({...c, [8]: val}))} />
+            <Field label="Team 2 Dot Balls" type="number" value={formValues[9]} onChange={(val) => setFormValues(c => ({...c, [9]: val}))} />
             
-            <Field label="Team 2 Dot Balls" value={formValues[9]} onChange={(val) => setFormValues(c => ({...c, [9]: val}))} />
             <Field label="Status" type="select" options={['Active', 'Inactive']} value={formValues[10]} onChange={(val) => setFormValues(c => ({...c, [10]: val}))} />
           </div>
         </Modal>

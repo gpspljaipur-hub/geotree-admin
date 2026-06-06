@@ -41,7 +41,7 @@ export function SearchBar({ placeholder = 'Search...', value, onChange, showButt
   )
 }
 
-export function StatusToggle({ active: initialActive = true, tone = 'green' }) {
+export function StatusToggle({ active: initialActive = true, tone = 'green', onChange }) {
   const [active, setActive] = useState(initialActive)
   
   useEffect(() => {
@@ -54,10 +54,16 @@ export function StatusToggle({ active: initialActive = true, tone = 'green' }) {
   const toggleBgClass = active ? (isPink ? 'bg-[#df3b91]' : 'bg-green-500') : 'bg-gray-300'
   const textClass = active ? (isPink ? 'text-[#df3b91]' : 'text-green-700') : 'text-gray-500'
 
+  const handleToggle = () => {
+    const newState = !active
+    setActive(newState)
+    if (onChange) onChange(newState)
+  }
+
   return (
     <span 
       className={`inline-flex items-center gap-2 py-1.5 px-3 rounded-full text-[9px] font-[850] uppercase tracking-wider cursor-pointer transition-colors ${active && isPink ? 'bg-transparent' : bgClass}`} 
-      onClick={() => setActive(!active)}
+      onClick={handleToggle}
     >
       <i className={`relative w-[34px] h-[18px] rounded-full transition-colors ${toggleBgClass}`}>
         <b className={`absolute top-[2px] w-[14px] h-[14px] bg-white rounded-full transition-transform ${active ? 'left-[18px]' : 'left-[2px]'}`} />
@@ -78,7 +84,10 @@ export function Badge({ children, tone = 'blue' }) {
   return <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-[11px] font-[850] tracking-wide ${toneClass}`}>{children}</span>
 }
 
-export function Avatar({ name = '?', color = 'pink' }) {
+export function Avatar({ name = '?', color = 'pink', src }) {
+  if (src) {
+    return <img src={src} alt={name} className="w-10 h-10 rounded-full object-contain bg-white border border-gray-100 p-1 shadow-sm" />
+  }
   const initials = name === '?' ? '?' : name.split(' ').map((part) => part[0]).join('').slice(0, 2)
   return <span className="grid place-items-center w-10 h-10 rounded-full text-xs font-bold bg-pink-100 text-pink-700 uppercase">{initials}</span>
 }
@@ -151,7 +160,7 @@ export function Modal({ title, children, onClose, submitLabel = 'SAVE', onSubmit
 export function Field({ label, required, type = 'text', placeholder, options, full = false, value, onChange }) {
   const isFile = type === 'file'
   const props = {
-    onChange: (event) => onChange?.(event.target.value),
+    onChange: (event) => onChange?.(isFile ? event.target.files[0] : event.target.value),
   }
   if (!isFile) {
     props.value = value ?? ''
@@ -167,7 +176,12 @@ export function Field({ label, required, type = 'text', placeholder, options, fu
       ) : type === 'select' ? (
         <select className={inputClass} {...props}>
           <option value="">{placeholder || `Select ${label}`}</option>
-          {(options || []).map((option) => <option value={option} key={option}>{option}</option>)}
+          {(options || []).map((option) => {
+            const isObj = typeof option === 'object' && option !== null;
+            const val = isObj ? option.value : option;
+            const text = isObj ? option.label : option;
+            return <option value={val} key={val}>{text}</option>;
+          })}
         </select>
       ) : (
         <input className={inputClass} type={type} placeholder={placeholder} {...props} />
@@ -176,10 +190,10 @@ export function Field({ label, required, type = 'text', placeholder, options, fu
   )
 }
 
-export function EntityCell({ title, subtitle, avatar = true }) {
+export function EntityCell({ title, subtitle, avatar = true, image }) {
   return (
     <div className="flex items-center gap-4">
-      {avatar && <Avatar name={title} />}
+      {avatar && <Avatar name={title} src={image} />}
       <div className="flex flex-col">
         <strong className="text-[14px] font-bold text-gray-800">{title}</strong>
         {subtitle && <small className="text-[12px] font-semibold text-gray-400">{subtitle}</small>}

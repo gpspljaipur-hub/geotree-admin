@@ -51,6 +51,18 @@ export default function PaymentsPage() {
     }
   }
 
+  const handleDelete = async (row) => {
+    if (window.confirm(`Are you sure you want to delete payment ${row.transaction_id}?`)) {
+      try {
+        await apiService.deletePayment({ id: row.id })
+        fetchData()
+      } catch (err) {
+        console.error("Error deleting payment:", err)
+        alert("Failed to delete payment.")
+      }
+    }
+  }
+
   const filteredRows = useMemo(
     () => rows.filter((row) => `${row.transaction_id} ${row.customer_name} ${row.customer_mobile}`.toLowerCase().includes(query.toLowerCase())),
     [query, rows]
@@ -62,8 +74,8 @@ export default function PaymentsPage() {
     { key: 'module', label: 'MODULE', render: (row) => <Badge>{row.module}</Badge> },
     { key: 'amount', label: 'AMOUNT', render: (row) => <strong className="text-[14px] font-black text-green-600">+{row.currency === 'INR' ? '₹' : row.currency} {row.amount}</strong> },
     { key: 'status', label: 'STATUS', render: (row) => {
-        const isCompleted = row.status === 'Completed'
-        const isCancelled = row.status === 'Cancelled'
+        const isCompleted = row.status === 'Completed' || row.status === 'Successful' || row.status === 'Success'
+        const isCancelled = row.status === 'Cancelled' || row.status === 'Failed'
         return (
           <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold tracking-widest uppercase rounded-md border ${isCompleted ? 'text-green-700 bg-green-50 border-green-100' : isCancelled ? 'text-red-700 bg-red-50 border-red-100' : 'text-orange-700 bg-orange-50 border-orange-100'}`}>
             <i className={`w-1.5 h-1.5 rounded-full ${isCompleted ? 'bg-green-500' : isCancelled ? 'bg-red-500' : 'bg-orange-500'}`} /> {row.status}
@@ -71,7 +83,7 @@ export default function PaymentsPage() {
         )
       } 
     },
-    { key: 'actions', label: 'ACTIONS', render: () => <button className="w-8 h-8 grid place-items-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer border-0 bg-transparent" type="button"><Icon name="trash" size={18} /></button> },
+    { key: 'actions', label: 'ACTIONS', render: (row) => <button className="w-8 h-8 grid place-items-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer border-0 bg-transparent" type="button" onClick={() => handleDelete(row)}><Icon name="trash" size={18} /></button> },
   ]
 
   return (

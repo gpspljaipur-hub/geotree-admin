@@ -6,6 +6,7 @@ import { apiService } from '../config/apiService'
 export default function CertificatesPage() {
   const [query, setQuery] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [selectedCert, setSelectedCert] = useState(null)
   
@@ -21,7 +22,11 @@ export default function CertificatesPage() {
   const [plantations, setPlantations] = useState([])
   const [plantationsLoading, setPlantationsLoading] = useState(false)
   const [selectedPlantationStr, setSelectedPlantationStr] = useState('')
-  const [categoryStr, setCategoryStr] = useState('')
+  const [categoryStr, setCategoryStr] = useState('Plantation (Standard)')
+
+  // For Edit Modal
+  const [editId, setEditId] = useState(null)
+  const [editCategoryStr, setEditCategoryStr] = useState('')
 
   useEffect(() => {
     fetchData()
@@ -33,9 +38,9 @@ export default function CertificatesPage() {
 
   useEffect(() => {
     if (selectedUserStr) {
-      const selectedUser = users.find(u => `${u.name || 'Unknown User'} - ${u.mobile || 'N/A'}` === selectedUserStr)
-      if (selectedUser && selectedUser._id) {
-        fetchUserPlantations(selectedUser._id)
+      const selectedUser = users.find(u => `${u.name || 'Unknown User'} - ${u.mobile || u.email || 'N/A'}` === selectedUserStr)
+      if (selectedUser && (selectedUser._id || selectedUser.id)) {
+        fetchUserPlantations(selectedUser._id || selectedUser.id)
       } else {
         setPlantations([])
       }
@@ -83,7 +88,7 @@ export default function CertificatesPage() {
       const mappedRows = dataList.map(item => ({
         id: item.certificate_id || item._id,
         user: item.user_id?.name || item.user_name || "Unknown User",
-        phone: item.user_id?.mobile || item.user_mobile || "N/A",
+        phone: item.user_id?.mobile || item.user_id?.email || item.user_mobile || "N/A",
         trees: `${item.trees_count || 1} Trees`,
         site: item.site_name || "Unknown Site",
         category: item.category || item.plantation_source || "PLANTATION",
@@ -108,7 +113,59 @@ export default function CertificatesPage() {
     setPreviewOpen(true)
   }
 
-  const userOptions = useMemo(() => users.map(u => `${u.name || 'Unknown User'} - ${u.mobile || 'N/A'}`), [users])
+  const handleEdit = (row) => {
+    setEditId(row.id)
+    setEditCategoryStr(row.category)
+    setEditOpen(true)
+  }
+
+  const handleDelete = async (row) => {
+    if (window.confirm("Are you sure you want to delete this certificate?")) {
+      try {
+        await apiService.deleteCertificate({ id: row.id })
+        fetchData()
+      } catch (err) {
+        console.error("Error deleting certificate:", err)
+        alert("Failed to delete certificate")
+      }
+    }
+  }
+
+  const saveCreate = async () => {
+    try {
+      const selectedUser = users.find(u => `${u.name || 'Unknown User'} - ${u.mobile || u.email || 'N/A'}` === selectedUserStr)
+      const selectedPlantation = plantations.find(p => `${p.trees_count || p.plants?.[0]?.quantity || 1} Trees at ${p.site_name || 'Unknown Site'} (${new Date(p.date || p.createdAt).toLocaleDateString()})` === selectedPlantationStr)
+      
+      const payload = {
+        user_id: selectedUser?._id || selectedUser?.id,
+        plantation_id: selectedPlantation?._id || selectedPlantation?.id,
+        category: categoryStr
+      }
+
+      await apiService.addCertificate(payload)
+      setCreateOpen(false)
+      fetchData()
+    } catch (err) {
+      console.error("Error generating certificate:", err)
+      alert("Failed to generate certificate. Please ensure all fields are correctly selected.")
+    }
+  }
+
+  const saveEdit = async () => {
+    try {
+      await apiService.updateCertificate({
+        id: editId,
+        category: editCategoryStr
+      })
+      setEditOpen(false)
+      fetchData()
+    } catch (err) {
+      console.error("Error updating certificate:", err)
+      alert("Failed to update certificate")
+    }
+  }
+
+  const userOptions = useMemo(() => users.map(u => `${u.name || 'Unknown User'} - ${u.mobile || u.email || 'N/A'}`), [users])
   const plantationOptions = useMemo(() => plantations.map(p => `${p.trees_count || p.plants?.[0]?.quantity || 1} Trees at ${p.site_name || 'Unknown Site'} (${new Date(p.date || p.createdAt).toLocaleDateString()})`), [plantations])
 
   const columns = [
@@ -117,12 +174,17 @@ export default function CertificatesPage() {
     { key: 'trees', label: 'TREES & SITE', render: (row) => <div className="flex flex-col"><strong className="text-[14px] font-bold text-gray-800">{row.trees}</strong><small className="text-[12px] font-semibold text-gray-400 mt-0.5">{row.site}</small></div> },
     { key: 'category', label: 'CATEGORY', render: (row) => <Badge>{row.category}</Badge> },
     { key: 'date', label: 'ISSUE DATE' },
-    { key: 'view', label: 'ACTIONS', render: (row) => <div className="flex items-center gap-2"><button className="inline-flex items-center gap-1.5 h-8 px-3 bg-white border border-gray-200 rounded-[8px] text-[10px] font-bold tracking-widest text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => handlePreview(row)} type="button"><Icon name="eye" size={16} /> VIEW</button><button className="inline-flex items-center gap-1.5 h-8 px-3 bg-white border border-gray-200 rounded-[8px] text-[10px] font-bold tracking-widest text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer" type="button"><Icon name="download" size={16} /> PDF</button></div> },
-    { key: 'actions', label: 'ACTIONS', render: () => <div className="flex items-center justify-end gap-1"><button className="w-8 h-8 grid place-items-center rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer border-0 bg-transparent" type="button"><Icon name="edit" size={18} /></button><button className="w-8 h-8 grid place-items-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer border-0 bg-transparent" type="button"><Icon name="trash" size={18} /></button></div> },
+    { key: 'view', label: 'PREVIEW', render: (row) => <div className="flex items-center gap-2"><button className="inline-flex items-center gap-1.5 h-8 px-3 bg-white border border-gray-200 rounded-[8px] text-[10px] font-bold tracking-widest text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => handlePreview(row)} type="button"><Icon name="eye" size={16} /> VIEW</button></div> },
+    { key: 'actions', label: 'ACTIONS', render: (row) => <div className="flex items-center justify-end gap-1"><button className="w-8 h-8 grid place-items-center rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer border-0 bg-transparent" onClick={() => handleEdit(row)} type="button"><Icon name="edit" size={18} /></button><button className="w-8 h-8 grid place-items-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer border-0 bg-transparent" onClick={() => handleDelete(row)} type="button"><Icon name="trash" size={18} /></button></div> },
   ]
   return (
     <>
-      <PageHeader title="Certificates" description="Manage and issue digital certificates for plantations and carbon credits." actionLabel="ADD CERTIFICATE" onAction={() => setCreateOpen(true)} />
+      <PageHeader title="Certificates" description="Manage and issue digital certificates for plantations and carbon credits." actionLabel="ADD CERTIFICATE" onAction={() => {
+        setSelectedUserStr('');
+        setSelectedPlantationStr('');
+        setCategoryStr('Plantation (Standard)');
+        setCreateOpen(true);
+      }} />
       <TableCard>
         <SearchBar placeholder="Search by ID, User, or Site..." value={query} onChange={setQuery} showButton={true} />
         {loading ? (
@@ -134,15 +196,25 @@ export default function CertificatesPage() {
           </>
         )}
       </TableCard>
+
       {createOpen && (
-        <Modal title="Register New Certificate" submitLabel="REGISTER CERTIFICATE" onClose={() => setCreateOpen(false)} onSubmit={() => setCreateOpen(false)}>
+        <Modal title="Register New Certificate" submitLabel="GENERATE CERTIFICATE" onClose={() => setCreateOpen(false)} onSubmit={saveCreate}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Field label="Select User" required type="select" options={userOptions} placeholder={usersLoading ? "Loading users..." : "Select User"} value={selectedUserStr} onChange={setSelectedUserStr} full />
             <Field label="Select Plantation Order" required type="select" options={plantationOptions} placeholder={plantationsLoading ? "Loading plantations..." : (selectedUserStr ? "Select Plantation" : "Select User First")} value={selectedPlantationStr} onChange={setSelectedPlantationStr} full />
-            <Field label="Certificate Category (Optional - Auto-detected)" type="select" options={['Plantation (Standard)', 'Occasion / Event', 'Carbon Offset', 'IPL Dot Ball', 'Support Team']} value={categoryStr} onChange={setCategoryStr} full />
+            <Field label="Certificate Category" type="select" options={['Plantation (Standard)', 'Occasion / Event', 'Carbon Offset', 'IPL Dot Ball', 'Support Team']} value={categoryStr} onChange={setCategoryStr} full />
           </div>
         </Modal>
       )}
+
+      {editOpen && (
+        <Modal title="Update Certificate" submitLabel="SAVE CHANGES" onClose={() => setEditOpen(false)} onSubmit={saveEdit}>
+          <div className="grid grid-cols-1 gap-6">
+            <Field label="Certificate Category" required type="select" options={['Plantation (Standard)', 'Occasion / Event', 'Carbon Offset', 'IPL Dot Ball', 'Support Team']} value={editCategoryStr} onChange={setEditCategoryStr} full />
+          </div>
+        </Modal>
+      )}
+
       {previewOpen && selectedCert && (
         <div className="fixed inset-0 z-[60] p-4 md:p-8 grid place-items-center bg-slate-900/60 backdrop-blur-md overflow-y-auto" role="presentation" onMouseDown={() => setPreviewOpen(false)}>
           <section className="relative w-full max-w-[840px] bg-white rounded-[24px] shadow-2xl p-6 md:p-8" onMouseDown={(event) => event.stopPropagation()}>

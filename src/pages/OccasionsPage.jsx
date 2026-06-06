@@ -1,7 +1,8 @@
 import { useMemo, useState, useEffect } from 'react'
-import { Actions, Badge, DataTable, EntityCell, Field, Modal, PageHeader, SearchBar, StatusToggle, TableCard , Pagination } from '../components/ui'
+import { Actions, Badge, DataTable, EntityCell, Field, Modal, PageHeader, SearchBar, StatusToggle, TableCard, Pagination } from '../components/ui'
 import Icon from '../components/Icon'
 import { apiService } from '../config/apiService'
+import { API_CONFIG } from '../config/endpoints'
 
 export default function OccasionsPage() {
   const [query, setQuery] = useState('')
@@ -39,44 +40,91 @@ export default function OccasionsPage() {
       }))
       setRows(mappedRows)
     } catch (err) {
-      console.error("Error fetching:", err)
+      console.error("Error fetching occasions:", err)
     } finally {
       setLoading(false)
     }
   }
 
   const filteredRows = useMemo(
-    () => rows.filter((row) => row.values.join(' ').toLowerCase().includes(query.toLowerCase())),
+    () => rows.filter((row) => (row.original.name || '').toLowerCase().includes(query.toLowerCase())),
     [query, rows],
   )
 
   const openCreate = () => {
     setEditingId(null)
-    setFormValues({})
+    setFormValues({
+      0: '',
+      1: '',
+      2: 'Active',
+      3: ''
+    })
     setModalOpen(true)
   }
 
   const openEdit = (row) => {
     setEditingId(row.id)
-    const initialValues = {}
-    row.values.slice(0, 3).forEach((val, i) => {
-      initialValues[i] = val || ''
+    const st = row.original
+    setFormValues({
+      0: st.name || '',
+      1: st.occasion_image ? `${API_CONFIG.IMAGE_URL}${st.occasion_image}` : '',
+      2: st.status !== false ? 'Active' : 'Inactive',
+      3: st.description || ''
     })
-    setFormValues(initialValues)
     setModalOpen(true)
   }
 
-  const saveRecord = () => {
-    const nextValues = []
-    for (let i = 0; i < 3; i++) {
-      nextValues.push(formValues[i] || (i === 0 ? 'New Occasion' : '—'))
+  const saveRecord = async () => {
+    try {
+      const formData = new FormData()
+      if (editingId) formData.append('id', editingId)
+      
+      formData.append('name', formValues[0] || 'New Occasion')
+      formData.append('status', String(formValues[2] === 'Active'))
+      formData.append('description', formValues[3] || '')
+
+      if (formValues[1] && typeof formValues[1] === 'object') {
+        formData.append('image', formValues[1])
+      }
+
+      if (editingId) {
+        await apiService.updateOccasion(formData)
+      } else {
+        await apiService.addOccasion(formData)
+      }
+
+      setModalOpen(false)
+      fetchData()
+    } catch (err) {
+      console.error("Error saving occasion:", err)
+      alert("Failed to save occasion.")
     }
-    if (editingId) {
-      setRows((current) => current.map((row) => row.id === editingId ? { ...row, values: nextValues } : row))
-    } else {
-      setRows((current) => [...current, { id: 'OccasionsPage-' + Date.now(), values: nextValues }])
+  }
+
+  const handleDelete = async (row) => {
+    if (window.confirm("Are you sure you want to delete this occasion?")) {
+      try {
+        await apiService.deleteOccasion({ id: row.id })
+        fetchData()
+      } catch (err) {
+        console.error("Error deleting occasion:", err)
+        alert("Failed to delete occasion.")
+      }
     }
-    setModalOpen(false)
+  }
+
+  const handleStatusChange = async (row, newStatus) => {
+    try {
+      const formData = new FormData()
+      formData.append('id', row.id)
+      formData.append('status', String(newStatus))
+      await apiService.updateOccasion(formData)
+      setRows((current) => current.map(r => r.id === row.id ? { ...r, original: { ...r.original, status: newStatus } } : r))
+    } catch (err) {
+      console.error("Error updating status:", err)
+      alert("Failed to update status.")
+      fetchData()
+    }
   }
 
   const openConfigure = (row) => {
@@ -101,21 +149,36 @@ export default function OccasionsPage() {
     setFormFields([...formFields, { label: '', type: 'Text Input', required: false }])
   }
 
-  const saveConfiguration = () => {
-    // In a real application, an API call would be made here to save the formFields
-    setRows((current) => current.map((r) => 
-      r.id === configuringRow.id 
-        ? { ...r, original: { ...r.original, form_fields: formFields } } 
-        : r
-    ))
-    setConfigureOpen(false)
+  const saveConfiguration = async () => {
+    try {
+      const formData = new FormData()
+      formData.append('id', configuringRow.id)
+      formData.append('form_fields', JSON.stringify(formFields))
+      await apiService.updateOccasion(formData)
+      
+      setRows((current) => current.map((r) => 
+        r.id === configuringRow.id 
+          ? { ...r, original: { ...r.original, form_fields: formFields } } 
+          : r
+      ))
+      setConfigureOpen(false)
+    } catch (err) {
+      console.error("Error saving configuration:", err)
+      alert("Failed to save configuration.")
+    }
   }
 
   const columns = [
     { 
       key: 'col-0', 
       label: 'OCCASION DETAILS', 
-      render: (row) => <EntityCell title={row.original.name || 'Unnamed'} subtitle="" /> 
+      render: (row) => (
+        <EntityCell 
+          title={row.original.name || 'Unnamed'} 
+          subtitle={row.original.description || ''} 
+          image={row.original.occasion_image ? `${API_CONFIG.IMAGE_URL}${row.original.occasion_image}` : null}
+        /> 
+      )
     },
     { 
       key: 'col-1', 
@@ -134,14 +197,14 @@ export default function OccasionsPage() {
         </div>
       )
     },
-    { key: 'col-2', label: 'STATUS', render: (row) => <StatusToggle active={row.original.status !== false} /> },
+    { key: 'col-2', label: 'STATUS', render: (row) => <StatusToggle active={row.original.status !== false} onChange={(newStatus) => handleStatusChange(row, newStatus)} /> },
     {
       key: 'col-3',
       label: 'ACTIONS',
       render: (row) => (
         <Actions
           onEdit={() => openEdit(row)}
-          onDelete={() => setRows((current) => current.filter((item) => item.id !== row.id))}
+          onDelete={() => handleDelete(row)}
         />
       ),
     }
@@ -172,8 +235,24 @@ export default function OccasionsPage() {
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Field label="Occasion Name" required placeholder="e.g. Birthday, Anniversary" value={formValues[0]} onChange={(val) => setFormValues(c => ({...c, [0]: val}))} />
-            <Field label="Display Image Upload" required type="file" value={formValues[1]} onChange={(val) => setFormValues(c => ({...c, [1]: val}))} />
             <Field label="Status" type="select" options={['Active', 'Inactive']} value={formValues[2]} onChange={(val) => setFormValues(c => ({...c, [2]: val}))} />
+            
+            <div className="flex flex-col gap-2 md:col-span-2">
+              <Field label="Display Image Upload (Optional on Edit)" type="file" full onChange={(val) => setFormValues(c => ({...c, [1]: val}))} />
+              {formValues[1] && (
+                <div className="flex items-center gap-3 mt-1 p-2 bg-gray-50 rounded-xl border border-gray-100 w-max pr-4">
+                  <img 
+                    src={typeof formValues[1] === 'string' ? formValues[1] : URL.createObjectURL(formValues[1])} 
+                    alt="Preview" 
+                    className="w-10 h-10 rounded-lg object-contain p-1 border border-gray-100 shadow-sm bg-white" 
+                  />
+                  <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+                    {typeof formValues[1] === 'string' ? 'Current Image' : 'New Image Selected'}
+                  </span>
+                </div>
+              )}
+            </div>
+
             <Field label="Description" type="textarea" placeholder="Enter occasion details..." full value={formValues[3]} onChange={(val) => setFormValues(c => ({...c, [3]: val}))} />
           </div>
         </Modal>
