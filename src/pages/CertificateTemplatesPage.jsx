@@ -40,7 +40,10 @@ export default function CertificateTemplatesPage() {
       name: '',
       category: 'Occasion',
       title: 'Certificate of Appreciation',
+      subTitle: 'Special Recognition',
       description: 'Marking this special occasion...',
+      tagline: 'Nurturing a greener and more sustainable future',
+      primaryColor: 'Forest Green (Eco)',
       template_file: ''
     })
     setDesignerOpen(true)
@@ -50,9 +53,12 @@ export default function CertificateTemplatesPage() {
     setEditingId(t._id || t.id)
     setFormValues({
       name: t.name || '',
-      category: t.category || 'Occasion',
+      category: t.category || t.type || 'Occasion',
       title: t.title || '',
+      subTitle: t.subTitle || '',
       description: t.description || '',
+      tagline: t.tagline || '',
+      primaryColor: t.primaryColor || 'Forest Green (Eco)',
       template_file: t.template_file || t.background_image || ''
     })
     setDesignerOpen(true)
@@ -77,13 +83,19 @@ export default function CertificateTemplatesPage() {
       
       formData.append('name', formValues.name || 'Unnamed Template')
       formData.append('category', formValues.category)
-      formData.append('title', formValues.title || '')
-      formData.append('description', formValues.description || '')
+      formData.append('type', formValues.category) // Backend maps category to type
+      formData.append('title', formValues.title || 'Certificate Title')
+      formData.append('subTitle', formValues.subTitle || 'Sub Heading')
+      formData.append('description', formValues.description || 'Description')
+      formData.append('tagline', formValues.tagline || 'Tagline')
+      formData.append('primaryColor', formValues.primaryColor || '#000000')
       
       if (formValues.template_file && typeof formValues.template_file === 'object') {
         formData.append('template_file', formValues.template_file)
-      } else if (!formValues.template_file && !editingId) {
-        // Mock html_template if file isn't uploaded just to pass validation
+      }
+      
+      // Always provide a fallback html_template to satisfy backend validation if required
+      if (!formValues.html_template) {
         formData.append('html_template', '<div></div>')
       }
 
@@ -139,7 +151,12 @@ export default function CertificateTemplatesPage() {
             
             <h3 className="text-[11px] font-black tracking-widest text-blue-600 uppercase mb-6 pb-3 border-b border-gray-100 m-0">CERTIFICATE CONTENT</h3>
             <div className="flex flex-col gap-6 mb-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Field label="Sub-heading (subTitle)" value={formValues.subTitle} onChange={(v) => setFormValues(f => ({...f, subTitle: v}))} full />
+                <Field label="Primary Design Color" value={formValues.primaryColor} onChange={(v) => setFormValues(f => ({...f, primaryColor: v}))} placeholder="e.g. Forest Green or #2E8B57" full />
+              </div>
               <Field label="Main Description (Supports Variables)" type="textarea" value={formValues.description} onChange={(v) => setFormValues(f => ({...f, description: v}))} full />
+              <Field label="Tagline (Footer)" value={formValues.tagline} onChange={(v) => setFormValues(f => ({...f, tagline: v}))} full />
             </div>
 
             <div className="mb-10">

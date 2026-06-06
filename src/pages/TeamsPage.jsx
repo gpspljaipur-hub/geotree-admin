@@ -31,7 +31,9 @@ export default function TeamsPage() {
       const dataList = res?.data?.data || res?.data || (Array.isArray(res) ? res : [])
       if (res?.pagination) setTotalPages(res.pagination.pages || 1)
       
-      const tList = toursRes?.data?.data || toursRes?.data || []
+      let tList = toursRes?.data?.data || toursRes?.data || []
+      if (!Array.isArray(tList) && tList.docs) tList = tList.docs
+      if (!Array.isArray(tList)) tList = []
       setTournaments(tList)
       
       const mappedRows = dataList.map((st, index) => ({

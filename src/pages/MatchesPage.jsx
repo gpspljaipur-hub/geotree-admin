@@ -34,8 +34,16 @@ export default function MatchesPage() {
       if (res?.pagination) setTotalPages(res.pagination.pages || 1)
       const dataList = res?.data?.data || res?.data || (Array.isArray(res) ? res : [])
       
-      setTournaments(toursRes?.data?.data || toursRes?.data || [])
-      setTeams(teamsRes?.data?.data || teamsRes?.data || [])
+      let tList = toursRes?.data?.data || toursRes?.data || []
+      if (!Array.isArray(tList) && tList.docs) tList = tList.docs
+      if (!Array.isArray(tList)) tList = []
+      
+      let teamList = teamsRes?.data?.data || teamsRes?.data || []
+      if (!Array.isArray(teamList) && teamList.docs) teamList = teamList.docs
+      if (!Array.isArray(teamList)) teamList = []
+      
+      setTournaments(tList)
+      setTeams(teamList)
       
       const mappedRows = dataList.map((st, index) => ({
         id: st._id || st.id || `MatchesPage-${index}`,
