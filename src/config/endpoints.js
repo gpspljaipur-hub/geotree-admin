@@ -1,0 +1,32 @@
+export const API_CONFIG = {
+  BASE_URL: "http://192.168.0.19:5030/",
+  IMAGE_URL: "http://192.168.0.19:5030",
+  TIMEOUT: 10000,
+};
+
+export const ENDPOINTS = {
+  ADMIN_LOGIN: "api/admin/auth/login",
+  ADMIN_STATS: "api/admin/stats",
+  STATES_LIST: "api/state/list",
+  PLANTATION_SITES_LIST: "api/site/sitelist",
+  SPECIES_LIST: "api/species/list",
+  CATEGORIES_LIST: "api/category/list",
+  OCCASIONS_LIST: "api/occasion/list",
+  TOURNAMENTS_LIST: "api/ipl/tournaments/list",
+  TEAMS_LIST: "api/ipl/teams/list",
+  MATCHES_LIST: "api/ipl/matches/list",
+  NURSERIES_LIST: "api/master/nursery/list",
+  ADMINS_LIST: "api/admin/users/list",
+  EMISSION_FACTORS_LIST: "api/carbon/emission-factors/list",
+  CARBON_FOOTPRINT_LIST: "api/admin-ui/models/Carbon/list",
+  OCCASION_PLANTATIONS_LIST: "api/plantation/plantations/list/occasion",
+  MATCH_PLANTATIONS_LIST: "api/plantation/plantations/list/ipl-match",
+  TEAM_PLANTATIONS_LIST: "api/plantation/plantations/list/ipl-team",
+  CARBON_PLANTATIONS_LIST: "api/plantation/plantations/list/carbon",
+  PLANTATION_LIST: "api/plantation/plantations/list",
+  PAYMENT_LIST: "api/payment/list",
+  CERTIFICATE_LIST: "api/certificate/list",
+  SITE_INVENTORY_LIST: "api/site-inventory/list",
+  CERTIFICATE_TEMPLATES_LIST: "api/certificate-templates/list",
+  LOCATION_STATES: "api/location-data/states",
+};

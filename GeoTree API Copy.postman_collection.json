@@ -1,0 +1,4405 @@
+{
+  "info": {
+    "_postman_id": "bf79d06f-5392-4915-8a5a-9132baea00b1",
+    "name": "GeoTree API Copy",
+    "description": "Complete Postman collection for GeoTree API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51119012",
+    "_collection_link": "https://go.postman.co/collection/51119012-bf79d06f-5392-4915-8a5a-9132baea00b1?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "API Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth (User)",
+      "item": [
+        {
+          "name": "Check Number",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobile\": \"7742817177\"\n}"
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/auth/check-number",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "check-number"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobile\": \"7742817177\",\n  \"otp\": \"683189\",\n  \"device_token\":\"fHV9wJZgT3yE4wKMHJluVw:APA91bERadjRorjvjQFZD7fRd4YjGeaqHjPw1zIROaz_0x_AZKfT0Qm3iKShS7jxJGCoAS7yfrRb5roDMDKGJvXR3JylSCLRHlQ8JyFuyviTHbidgXSW3YE\",\n  \"privacy_policy\":true\n}"
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/auth/verify-otp",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "verify-otp"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Auth",
+      "item": [
+        {
+          "name": "Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const token = (json && json.data && json.data.token) || json.token;",
+                  "if (token) {",
+                  "  pm.collectionVariables.set(\"token\", token);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@geotree.com\",\n  \"password\": \"AdminPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/admin/auth/login",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login and store token in collection variable."
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"superadmin@geotree.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/auth/forgot-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "auth",
+                "forgot-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"\",\n  \"new_password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/auth/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "auth",
+                "reset-password"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Get Stats",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "stats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Admins/Users",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Admin/User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Admin/User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"old_password\": \"password123\",\n  \"new_password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/profile/password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "profile",
+                "password"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Audit",
+      "item": [
+        {
+          "name": "List Logs",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/audit/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "audit",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Category",
+      "item": [
+        {
+          "name": "List Categories",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMWZkNjhlYjM1ZmY4Y2Q2NTRiMmM0NiIsInR5cGUiOiJ1c2VyIiwiaWF0IjoxNzgwNDcxNDM4LCJleHAiOjE3ODMwNjM0Mzh9.2h8HAAUPzA2CmhkmYg6wwQNEZm_g0yXZfx71_Yb0g58",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/category/list",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "category",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Category",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZiNjMwODUwNmY1YjJjNTUxZTY4YyIsInJvbGUiOiJzdXBlcl9hZG1pbiIsInR5cGUiOiJhZG1pbiIsImlhdCI6MTc4MDQ3OTU2NywiZXhwIjoxNzgwNTIyNzY3fQ.LUgrVKgGo-FrMY_TUNpo0qx5PRu4ZuwopEWM8aOXR_s",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Carbon",
+                  "type": "text"
+                },
+                {
+                  "key": "type",
+                  "value": "Carbon",
+                  "type": "text"
+                },
+                {
+                  "key": "category_image",
+                  "type": "file",
+                  "src": [
+                    "",
+                    "/Users/apple/Documents/ZImagegreotree/carbon_img.png"
+                  ]
+                },
+                {
+                  "key": "description",
+                  "value": "Carbon is a fundamental chemical element (symbol: C, atomic number: 6). As the backbone of organic chemistry, it is the base for all known life on Earth. Because it can form up to four covalent bonds, it creates more compounds than all other elements combined",
+                  "type": "text",
+                  "uuid": "04d96bec-07d3-4497-8b9a-6e669a6759e3"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/category/add",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "category",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZiNjMwODUwNmY1YjJjNTUxZTY4YyIsInJvbGUiOiJzdXBlcl9hZG1pbiIsInR5cGUiOiJhZG1pbiIsImlhdCI6MTc4MDU1NDY4MiwiZXhwIjoxNzgwNTk3ODgyfQ.S1tqy48Jdaqe9ULBTkmLtGj42swvSY9hnp_IFV_aikk",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "id",
+                  "value": "6a1aa325d3083b9d5d9c3cb4",
+                  "type": "text"
+                },
+                {
+                  "key": "name",
+                  "value": "Plantation",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "type",
+                  "value": "Plantation",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "category_image",
+                  "type": "file",
+                  "src": "/Users/apple/Documents/ZImagegreotree/carbon_img.png"
+                },
+                {
+                  "key": "description",
+                  "value": "A plantation is a large-scale agricultural estate typically located in tropical or subtropical regions, dedicated to the commercial production of a single cash crop",
+                  "type": "text",
+                  "uuid": "b0bbb3bc-0e47-4566-8402-0f89bcdfef44",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/category/update",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "category",
+                "update"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/category/delete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "category",
+                "delete"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "State",
+      "item": [
+        {
+          "name": "List States",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZiNjMwODUwNmY1YjJjNTUxZTY4YyIsInJvbGUiOiJzdXBlcl9hZG1pbiIsInR5cGUiOiJhZG1pbiIsImlhdCI6MTc4MDQ4MTcxNywiZXhwIjoxNzgwNTI0OTE3fQ.-ze4JzlwPNoXOJnvPpvLbGkihMWCUTr5Rpd-2xGoZHI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"page\":\"1\",\n\"limit\":\"28\"}"
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/state/list",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "state",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add State",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "state_name",
+                  "value": "Goa",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Coastal paradise",
+                  "type": "text"
+                },
+                {
+                  "key": "state_image",
+                  "type": "file",
+                  "value": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/state/add",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "state",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update State",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZiNjMwODUwNmY1YjJjNTUxZTY4YyIsInJvbGUiOiJzdXBlcl9hZG1pbiIsInR5cGUiOiJhZG1pbiIsImlhdCI6MTc4MDU2MzgxOSwiZXhwIjoxNzgwNjA3MDE5fQ.wScumu7gwYAe8MdSDH92BSfLo110AM1m-UT_QJDqUcY",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "id",
+                  "value": "6a1ecedcad3af1c8fe740e5d",
+                  "type": "text"
+                },
+                {
+                  "key": "state_name",
+                  "value": "Goa",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "description",
+                  "value": "Coastal paradise",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "state_image",
+                  "type": "file",
+                  "src": "/Users/apple/Documents/ZImagegreotree/GeotreeImages/Madhya Pradesh.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/state/update",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "state",
+                "update"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete State",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/state/delete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "state",
+                "delete"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Species",
+      "item": [
+        {
+          "name": "List Species",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/species/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "species",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Species Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/species/details",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "species",
+                "details"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Species",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Pipal",
+                  "type": "text"
+                },
+                {
+                  "key": "scientific_name",
+                  "value": "Swietenia mahagoni",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "is a flowering tree recognized for its vibrant red and orange blossoms",
+                  "type": "text"
+                },
+                {
+                  "key": "co2_absorption",
+                  "value": "50",
+                  "type": "text"
+                },
+                {
+                  "key": "maturity_period",
+                  "value": "5 years",
+                  "type": "text"
+                },
+                {
+                  "key": "state_id",
+                  "value": "6a1eceaead3af1c8fe740e57",
+                  "type": "text"
+                },
+                {
+                  "key": "site_id",
+                  "value": "6a210d08ed5400a60cddf2f9",
+                  "type": "text"
+                },
+                {
+                  "key": "variations",
+                  "value": "[{\"height\":\"3 feet\",\"price\":100},{\"height\":\"5 feet\",\"price\":150}]",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "/Users/apple/Documents/ZImagegreotree/lex-melony-oEICXaLdHqc-unsplash (1).png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/species/add",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "species",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Species",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "name",
+                  "value": "Mango",
+                  "type": "text"
+                },
+                {
+                  "key": "price",
+                  "value": "100",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "value": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/species/update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "species",
+                "update"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Species",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/species/delete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "species",
+                "delete"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Master - Nursery",
+      "item": [
+        {
+          "name": "List Nurseries",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/master/nursery/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "master",
+                "nursery",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Nursery",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Nursery A",
+                  "type": "text"
+                },
+                {
+                  "key": "nursery_image",
+                  "type": "file",
+                  "value": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/master/nursery/add",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "master",
+                "nursery",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Nursery",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "name",
+                  "value": "Nursery A",
+                  "type": "text"
+                },
+                {
+                  "key": "nursery_image",
+                  "type": "file",
+                  "value": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/master/nursery/update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "master",
+                "nursery",
+                "update"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Nursery",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/master/nursery/delete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "master",
+                "nursery",
+                "delete"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Master - Certificate Templates",
+      "item": [
+        {
+          "name": "List Templates",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/master/template/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "master",
+                "template",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Template",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Template A",
+                  "type": "text"
+                },
+                {
+                  "key": "background_image",
+                  "type": "file",
+                  "value": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/master/template/add",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "master",
+                "template",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Template",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "name",
+                  "value": "Template A",
+                  "type": "text"
+                },
+                {
+                  "key": "background_image",
+                  "type": "file",
+                  "value": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/master/template/update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "master",
+                "template",
+                "update"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Template",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/master/template/delete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "master",
+                "template",
+                "delete"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Plantation",
+      "item": [
+        {
+          "name": "List Occasions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"page\":\"1\",\n\"limt\":\"20\"}"
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/plantation/occasions/list",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "plantation",
+                "occasions",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Occasion",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Wedding Anniversary",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "/Users/apple/Documents/ZImagegreotree/Aaoccasionimage/💍.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/plantation/occasions/add",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "plantation",
+                "occasions",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Occasion",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "id",
+                  "value": "6a1971ec63f21781d9e47171",
+                  "type": "text"
+                },
+                {
+                  "key": "name",
+                  "value": "Anniversary",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "value": null
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/plantation/occasions/update",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "plantation",
+                "occasions",
+                "update"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Occasion",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/plantation/occasions/delete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "plantation",
+                "occasions",
+                "delete"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Locations",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/plantation/locations/list",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "plantation",
+                "locations",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Plants",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/plantation/plants/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "plantation",
+                "plants",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Location",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Location A\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/plantation/locations/add",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "plantation",
+                "locations",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Location",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\",\n  \"name\": \"Location A\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/plantation/locations/update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "plantation",
+                "locations",
+                "update"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Location",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/plantation/locations/delete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "plantation",
+                "locations",
+                "delete"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Plantations",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/plantation/plantations/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "plantation",
+                "plantations",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Plantation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/plantation/plantations/add",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "plantation",
+                "plantations",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Plantation History",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/plantation/plantations/history",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "plantation",
+                "plantations",
+                "history"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "form_fields Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZiNjMwODUwNmY1YjJjNTUxZTY4YyIsInJvbGUiOiJzdXBlcl9hZG1pbiIsInR5cGUiOiJhZG1pbiIsImlhdCI6MTc4MDU1MTQ5NSwiZXhwIjoxNzgwNTk0Njk1fQ.L_FCNQdXQyIUiGmD48rkDUMVaL-Gn9AwWoCepAwCKoM"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "id",
+                  "value": "6a1aaa16e2f38bae9839caae",
+                  "type": "text"
+                },
+                {
+                  "key": "form_fields",
+                  "value": "[{\"label\":\"NAME\",\"key\":\"name\",\"field_type\":\"dropdown\",\"is_required\":true,\"placeholder\":\"\",\"options\":[\"1  - First Spark 🌟 2  - Growing Together 🌱 3  - Strong Beginnings 💫 4  - Building Bonds],\"_id\":\"6a1eab278ce00f3955088201\"}, {\"label\": \"Name\",\"key\": \"name\",\"field_type\": \"text\",\"is_required\": true,\"placeholder\": \"Enter your name\"},{\"label\": \"Age\",\"key\": \"age\",\"field_type\": \"number\",\"is_required\": true,\"placeholder\": \"Enter your age\"},] ",
+                  "type": "text"
+                },
+                {
+                  "key": "permanent_field_overrides",
+                  "value": "{\"state_id\":true,\"project_id\":true}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/plantation/occasions/update",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "plantation",
+                "occasions",
+                "update"
+              ]
+            },
+            "description": "Generated from cURL: curl -X PUT https://geotree-backend-8vxt.onrender.com/api/plantation/occasions/update \\\n  -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZiNjMwODUwNmY1YjJjNTUxZTY4YyIsInJvbGUiOiJzdXBlcl9hZG1pbiIsInR5cGUiOiJhZG1pbiIsImlhdCI6MTc4MDU1MTQ5NSwiZXhwIjoxNzgwNTk0Njk1fQ.L_FCNQdXQyIUiGmD48rkDUMVaL-Gn9AwWoCepAwCKoM\" \\\n  -F \"id=6a1aa9cee2f38bae9839ca9c\" \\\n  -F \"form_fields=[{\\\"label\\\":\\\"Sender Name\\\",\\\"key\\\":\\\"sender_name\\\",\\\"field_type\\\":\\\"text\\\",\\\"is_required\\\":true,\\\"placeholder\\\":\\\"Enter sender name\\\"},{\\\"label\\\":\\\"Receiver Name\\\",\\\"key\\\":\\\"receiver_name\\\",\\\"field_type\\\":\\\"text\\\",\\\"is_required\\\":true,\\\"placeholder\\\":\\\"Enter receiver name\\\"}]\" \\\n  -F \"permanent_field_overrides={\\\"state_id\\\":true,\\\"project_id\\\":false}\"\n"
+          },
+          "response": []
+        },
+        {
+          "name": "PlantationOccasionsRegenerate-forms",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZiNjMwODUwNmY1YjJjNTUxZTY4YyIsInJvbGUiOiJzdXBlcl9hZG1pbiIsInR5cGUiOiJhZG1pbiIsImlhdCI6MTc4MDU1MTQ5NSwiZXhwIjoxNzgwNTk0Njk1fQ.L_FCNQdXQyIUiGmD48rkDUMVaL-Gn9AwWoCepAwCKoM"
+              }
+            ],
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/plantation/occasions/regenerate-forms",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "plantation",
+                "occasions",
+                "regenerate-forms"
+              ]
+            },
+            "description": "Generated from cURL: curl -X POST https://geotree-backend-8vxt.onrender.com/api/plantation/occasions/regenerate-forms \\\n  -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZiNjMwODUwNmY1YjJjNTUxZTY4YyIsInJvbGUiOiJzdXBlcl9hZG1pbiIsInR5cGUiOiJhZG1pbiIsImlhdCI6MTc4MDU1MTQ5NSwiZXhwIjoxNzgwNTk0Njk1fQ.L_FCNQdXQyIUiGmD48rkDUMVaL-Gn9AwWoCepAwCKoM\"\n"
+          },
+          "response": []
+        },
+        {
+          "name": "OccasionsUpdate",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZiNjMwODUwNmY1YjJjNTUxZTY4YyIsInJvbGUiOiJzdXBlcl9hZG1pbiIsInR5cGUiOiJhZG1pbiIsImlhdCI6MTc4MDU1MTQ5NSwiZXhwIjoxNzgwNTk0Njk1fQ.L_FCNQdXQyIUiGmD48rkDUMVaL-Gn9AwWoCepAwCKoM"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "type": "text",
+                  "key": "id",
+                  "value": "6a1aaa16e2f38bae9839caae"
+                },
+                {
+                  "type": "text",
+                  "key": "form_fields",
+                  "value": "[{\"label\":\"NAME\",\"key\":\"name\",\"field_type\":\"dropdown\",\"is_required\":true,\"placeholder\":\"\",\"options\":[\"1  - First Spark 🌟 2  - Growing Together 🌱 3  - Strong Beginnings 💫 4  - Building Bonds]},{\"label\": \"Name\",\"key\": \"name\",\"field_type\": \"text\",\"is_required\": true,\"placeholder\": \"Enter your name\"},{\"label\": \"Age\",\"key\": \"age\",\"field_type\": \"number\",\"is_required\": true,\"placeholder\": \"Enter your age\"},] "
+                },
+                {
+                  "type": "text",
+                  "key": "permanent_field_overrides",
+                  "value": "{\"state_id\":true,\"project_id\":true}"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/plantation/occasions/update",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "plantation",
+                "occasions",
+                "update"
+              ]
+            },
+            "description": "Generated from cURL: curl -X PUT https://geotree-backend-8vxt.onrender.com/api/plantation/occasions/update \\\n  -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZiNjMwODUwNmY1YjJjNTUxZTY4YyIsInJvbGUiOiJzdXBlcl9hZG1pbiIsInR5cGUiOiJhZG1pbiIsImlhdCI6MTc4MDU1MTQ5NSwiZXhwIjoxNzgwNTk0Njk1fQ.L_FCNQdXQyIUiGmD48rkDUMVaL-Gn9AwWoCepAwCKoM\" \\\n  -F \"id=6a2142ea9e12f2782c92c2ec\" \\\n  -F \"form_fields=[{\\\"label\\\":\\\"Sender Name\\\",\\\"key\\\":\\\"sender_name\\\",\\\"field_type\\\":\\\"text\\\",\\\"is_required\\\":true,\\\"placeholder\\\":\\\"Enter sender name\\\"},{\\\"label\\\":\\\"Achiever Name\\\",\\\"key\\\":\\\"achiever_name\\\",\\\"field_type\\\":\\\"text\\\",\\\"is_required\\\":true,\\\"placeholder\\\":\\\"Enter achiever name\\\"},{\\\"label\\\":\\\"Achievement Description\\\",\\\"key\\\":\\\"achievement_desc\\\",\\\"field_type\\\":\\\"textarea\\\",\\\"is_required\\\":false,\\\"placeholder\\\":\\\"Describe the achievement\\\"}]\" \\\n  -F \"permanent_field_overrides={\\\"state_id\\\":true,\\\"project_id\\\":false}\"\n"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Certificates",
+      "item": [
+        {
+          "name": "List Certificates",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/certificate/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "certificate",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Certificate Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/certificate/details",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "certificate",
+                "details"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Download Certificate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/certificate/download",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "certificate",
+                "download"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Certificate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/certificate/generate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "certificate",
+                "generate"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"\",\n  \"amount\": 100,\n  \"trees_count\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Orders",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/user/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "user",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Orders",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Order Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/details",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "details"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Order Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\",\n  \"order_status\": \"Assigned\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Initiate Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payment/initiate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payment",
+                "initiate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirm Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payment/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payment",
+                "confirm"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Payments",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payment/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payment",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Payment Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payment/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payment",
+                "stats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "New Request",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Profile Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/profile/details",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profile",
+                "details"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/profile/update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profile",
+                "update"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Profile Image",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "value": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/profile/upload-image",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profile",
+                "upload-image"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "List Reviews",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reviews",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Review",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Great service",
+                  "type": "text"
+                },
+                {
+                  "key": "message",
+                  "value": "Loved it!",
+                  "type": "text"
+                },
+                {
+                  "key": "rating",
+                  "value": "5",
+                  "type": "text"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "value": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/add",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reviews",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Review",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/delete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reviews",
+                "delete"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Monitoring",
+      "item": [
+        {
+          "name": "Get Monitoring Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/monitoring/data",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "monitoring",
+                "data"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Monitoring Record",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "media",
+                  "type": "file",
+                  "value": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/monitoring/add",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "monitoring",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Field",
+      "item": [
+        {
+          "name": "Get Assignments",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/field/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "field",
+                "assignments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Execution",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "order_id",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "value": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/field/execute",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "field",
+                "execute"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Verification",
+      "item": [
+        {
+          "name": "List Pending Verifications",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/verification/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "verification",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Order",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\",\n  \"status\": \"Verified\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/verification/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "verification",
+                "verify"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Export Orders Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/export",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "export"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "IPL",
+      "item": [
+        {
+          "name": "Campaigns List",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ipl/campaigns/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "campaigns",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Campaign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ipl/campaigns",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "campaigns"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "IPL Config Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ipl/config/details",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "config",
+                "details"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update IPL Config",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ipl/config",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "config"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Tournaments List",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMWZkNjhlYjM1ZmY4Y2Q2NTRiMmM0NiIsInR5cGUiOiJ1c2VyIiwiaWF0IjoxNzgwNTUxMTQ0LCJleHAiOjE3ODMxNDMxNDR9.SVF23yS57iM0qpJztVSbH8hbyr5RAPgPh8wSW38lvEs",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/ipl/tournaments/list",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "tournaments",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Tournament",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "name",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "short_name",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "start_date",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "end_date",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "venue",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "tournament_status",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "tournament_id",
+                  "value": "6a1ecd48ad3af1c8fe740e32",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ipl/tournaments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "tournaments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Tournament",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "",
+                  "type": "text",
+                  "uuid": "9d9cbfe1-9e40-4257-8d47-6988664fe34f",
+                  "disabled": true
+                },
+                {
+                  "key": "short_name",
+                  "value": "",
+                  "type": "text",
+                  "uuid": "83c01036-9c2a-457a-9de0-34ce51e825ba",
+                  "disabled": true
+                },
+                {
+                  "key": "start_date",
+                  "value": "",
+                  "type": "text",
+                  "uuid": "d3002f30-7b85-41c8-b888-50dad8fa1bac",
+                  "disabled": true
+                },
+                {
+                  "key": "end_date",
+                  "value": "",
+                  "type": "text",
+                  "uuid": "3997723b-5198-49d4-9220-dd7a18316354",
+                  "disabled": true
+                },
+                {
+                  "key": "venue",
+                  "value": "",
+                  "type": "text",
+                  "uuid": "427bfa9f-62fa-4508-90c4-16cc3a71f5f2",
+                  "disabled": true
+                },
+                {
+                  "key": "tournament_status",
+                  "value": "",
+                  "type": "text",
+                  "uuid": "c7ba1933-3f37-4556-842c-03a91616dc0e",
+                  "disabled": true
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "uuid": "88b0b09f-6c4b-4f29-bd05-6ebdfbd9871c",
+                  "src": "/Users/apple/Documents/ZImagegreotree/GeotreeImages/BBL.png"
+                },
+                {
+                  "key": "tournament_id",
+                  "value": "6a1ecd48ad3af1c8fe740e32",
+                  "type": "text",
+                  "uuid": "31c0c532-6dd1-4739-9d04-c7e4c929ab2e"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/ipl/tournaments",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "tournaments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Tournament",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ipl/tournaments/{{tournament_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "tournaments",
+                "{{tournament_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Teams List",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTdlYWE5NTcyNTM1MDA0YzY3MGE5ZiIsInR5cGUiOiJ1c2VyIiwiaWF0IjoxNzgwMzgzNTIxLCJleHAiOjE3ODI5NzU1MjF9.BAmZjt2mV_bVgmKVQYVLJlbOxC4XbjD972YGIYBzSP4",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "user_id",
+                  "value": "6a2130aca411e163a5f05f26",
+                  "type": "text",
+                  "uuid": "2904f2c7-90ed-4979-ae3c-995bb518d5be"
+                },
+                {
+                  "key": "tournament_id",
+                  "value": "6a1ecd48ad3af1c8fe740e32",
+                  "type": "text",
+                  "uuid": "78dad774-9ce8-4755-8f7b-6f481cca1174"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/ipl/teams/list",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "teams",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Team",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZiNjMwODUwNmY1YjJjNTUxZTY4YyIsInJvbGUiOiJzdXBlcl9hZG1pbiIsInR5cGUiOiJhZG1pbiIsImlhdCI6MTc4MDYzNTU5OSwiZXhwIjoxNzgwNjc4Nzk5fQ.jy7ZtfJ0O66DSYUy4ahMTJLOWUBWiA4FyNMn4lvBw6o",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "team_name",
+                  "value": "HH",
+                  "type": "text"
+                },
+                {
+                  "key": "team_full_name",
+                  "value": "Hobart Hurricanes",
+                  "type": "text"
+                },
+                {
+                  "key": "tournament_id",
+                  "value": "6a1ecd48ad3af1c8fe740e32",
+                  "type": "text"
+                },
+                {
+                  "key": "logo",
+                  "type": "file",
+                  "src": "/Users/apple/Documents/ZImagegreotree/GeotreeImages/Hobart Hurricanes.png"
+                },
+                {
+                  "key": "team_color",
+                  "value": "#800080",
+                  "type": "text",
+                  "uuid": "55afd1bd-8c65-4341-a406-7272aac514be"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/ipl/teams",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "teams"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Team Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"team_id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ipl/teams/details",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "teams",
+                "details"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Team Preplant Support",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"team_id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ipl/teams/support",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "teams",
+                "support"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Team Image",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "team_logo",
+                  "type": "file",
+                  "src": "/Users/apple/Documents/ZImagegreotree/CSK.png"
+                },
+                {
+                  "key": "team_id",
+                  "value": "6a1ebbd25f17e197852029c8",
+                  "type": "text"
+                },
+                {
+                  "key": "team_color",
+                  "value": "",
+                  "type": "text",
+                  "uuid": "0451d120-c6df-43ba-a74e-2a2b3f31868c",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/ipl/teams/upload-image",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "teams",
+                "upload-image"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Matches List",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ipl/matches/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "matches",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Match",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"team1_id\": \"6a2258fbf7db8769bdd21448\",\n  \"team2_id\": \"6a225803f7db8769bdd21438\",\n  \"match_date\": \"2026-01-01\",\n  \"match_time\": \"18:00\",\n  \"venue\":\"Wankhede Stadium, Mumbai\",\n  \"match_type\":\"League\",\n  \"match_status\":\"upcoming\",\n  \"tournament_id\":\"6a1ecd48ad3af1c8fe740e32\",\n  \"team1_dotball\":\"50\",\n  \"team2_dotball\":\"50\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ipl/matches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "matches"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Match",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ipl/matches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "matches"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Dot Balls Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"match_id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ipl/matches/dot-balls/details",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "matches",
+                "dot-balls",
+                "details"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Dot Balls",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"match_id\": \"\",\n  \"team_id\": \"\",\n  \"dot_balls\": 0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ipl/matches/dot-balls",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "matches",
+                "dot-balls"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Match Support",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"match_id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ipl/matches/support",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "matches",
+                "support"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "IPL History",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ipl/history",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "history"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add_ipl_tournaments",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZiNjMwODUwNmY1YjJjNTUxZTY4YyIsInJvbGUiOiJzdXBlcl9hZG1pbiIsInR5cGUiOiJhZG1pbiIsImlhdCI6MTc4MDEzMTA0OCwiZXhwIjoxNzgwMTc0MjQ4fQ.XmpH7HMZ2XdMrOube2qcu6QaQfcwExTva-a50YDmjOg"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5030/api/ipl/tournaments",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5030",
+              "path": [
+                "api",
+                "ipl",
+                "tournaments"
+              ]
+            },
+            "description": "Generated from cURL: curl --location --request POST 'http://localhost:5030/api/ipl/tournaments' \\\n--header 'Content-Type: application/json' \\\n--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZiNjMwODUwNmY1YjJjNTUxZTY4YyIsInJvbGUiOiJzdXBlcl9hZG1pbiIsInR5cGUiOiJhZG1pbiIsImlhdCI6MTc4MDEzMTA0OCwiZXhwIjoxNzgwMTc0MjQ4fQ.XmpH7HMZ2XdMrOube2qcu6QaQfcwExTva-a50YDmjOg'"
+          },
+          "response": []
+        },
+        {
+          "name": "Challenge Leaderboard",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ipl/challenge",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "challenge"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Challenge",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ipl/challenge/update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ipl",
+                "challenge",
+                "update"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Carbon",
+      "item": [
+        {
+          "name": "Calculate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transport\": {},\n  \"electricity\": {},\n  \"food\": {}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/carbon/calculate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "calculate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user_id\": \"6a1fd68eb35ff8cd654b2c46\"}"
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/carbon/result",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "result"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "History",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/carbon/history",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "history"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Transport Types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/carbon/transport-types",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "transport-types"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Electricity Types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/carbon/electricity-types",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "electricity-types"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Food Types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/carbon/food-types",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "food-types"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Bulk Add Types",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/carbon/types/bulk-add",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "types",
+                "bulk-add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Emission Factors List",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/carbon/emission-factors/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "emission-factors",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Emission Factor",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "value": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/carbon/emission-factors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "emission-factors"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Emission Factor",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "name",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "value": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/carbon/emission-factors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "emission-factors"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Emission Factor",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/carbon/emission-factors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "emission-factors"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Offset Factors List",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/carbon/offset-factors/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "offset-factors",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Offset Factor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/carbon/offset-factors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "offset-factors"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Offset Factor",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/carbon/offset-factors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "offset-factors"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Offset Factor",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/carbon/offset-factors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "offset-factors"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Site",
+      "item": [
+        {
+          "name": "List Sites",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 1,\n  \"limit\": 10,\n  \"state_id\": \"6a1eceaead3af1c8fe740e57\",\n  \"status\": true\n}"
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/site/list",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "site",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sitelist All",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"search\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/site/sitelist",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "site",
+                "sitelist"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Site",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZiNjMwODUwNmY1YjJjNTUxZTY4YyIsInJvbGUiOiJzdXBlcl9hZG1pbiIsInR5cGUiOiJhZG1pbiIsImlhdCI6MTc4MDU1MDIzNSwiZXhwIjoxNzgwNTkzNDM1fQ.Ymrrc6tf3OCJXQJgsKp20ZTPFwkxssmbQPMjooDUILU",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "site_name",
+                  "value": "Unity Site",
+                  "type": "text"
+                },
+                {
+                  "key": "state_id",
+                  "value": "6a19734863f21781d9e4718a",
+                  "type": "text"
+                },
+                {
+                  "key": "district",
+                  "value": "Goa",
+                  "type": "text"
+                },
+                {
+                  "key": "site_image",
+                  "type": "file",
+                  "src": "/Users/apple/Documents/ZImagegreotree/premium_photo-1667126447968-f02d4cb36114.png"
+                },
+                {
+                  "key": "capacity",
+                  "value": "1000",
+                  "type": "text",
+                  "uuid": "f3bfa87d-23a2-4ee3-a8c1-c7a4e94798c3"
+                },
+                {
+                  "key": "description",
+                  "value": "Regional development hub.\\nCoordinates large-scale development projects across the region.\\nHosts planning meetings, stakeholder consultations, and training sessions.",
+                  "type": "text",
+                  "uuid": "da8cc314-087c-49fa-a495-7e6a89fc9048"
+                },
+                {
+                  "key": "blockRural training center.\\nOffers skill development and vocational training programs.\\nHelps improve employment opportunities in rural areas.",
+                  "value": "Main-West Block",
+                  "type": "text",
+                  "uuid": "de6755c6-5913-4a9b-a062-58fc5c646d16"
+                },
+                {
+                  "key": "village",
+                  "value": "Main-West vilage",
+                  "type": "text",
+                  "uuid": "eb0f3779-42e3-430e-99ab-3766eaba0b6e"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{geotreeLiveUrl}}/api/site/add",
+              "host": [
+                "{{geotreeLiveUrl}}"
+              ],
+              "path": [
+                "api",
+                "site",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Site",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "site_name",
+                  "value": "Updated Site",
+                  "type": "text"
+                },
+                {
+                  "key": "site_image",
+                  "type": "file",
+                  "value": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/site/update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "site",
+                "update"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Site",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/site/delete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "site",
+                "delete"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Boundary",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "site_id",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "value": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/site/upload-boundary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "site",
+                "upload-boundary"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Species Summary",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"site_id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/site/species-summary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "site",
+                "species-summary"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Occasion Standalone",
+      "item": [
+        {
+          "name": "List Occasions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/occasion/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "occasion",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Occasion Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/occasion/list/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "occasion",
+                "list",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Standalone States",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/occasion/states",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "occasion",
+                "states"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Standalone Projects",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"state_id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/occasion/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "occasion",
+                "projects"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Standalone Species",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"project_id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/occasion/species",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "occasion",
+                "species"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/details",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "details"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Legal",
+      "item": [
+        {
+          "name": "Get Privacy Policy",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/legal/privacy-policy",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "legal",
+                "privacy-policy"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "http://localhost:5030/api/ipl/teams",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZiNjMwODUwNmY1YjJjNTUxZTY4YyIsInJvbGUiOiJzdXBlcl9hZG1pbiIsInR5cGUiOiJhZG1pbiIsImlhdCI6MTc4MDM5ODY5MiwiZXhwIjoxNzgwNDQxODkyfQ.Xf7Iw4daB7qHyVkeYmPt3GOJs1GnRJqP-07HeiX5gps"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "type": "text",
+              "key": "team_name",
+              "value": "MIs"
+            },
+            {
+              "type": "text",
+              "key": "full_name",
+              "value": "Mumbai Indians"
+            },
+            {
+              "type": "file",
+              "key": "logo",
+              "src": "/Users/apple/Documents/ZImagegreotree/MI.png"
+            },
+            {
+              "type": "text",
+              "key": "tournament_id",
+              "value": "6a1aa78be2f38bae9839ca84"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:5030/api/ipl/teams",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5030",
+          "path": [
+            "api",
+            "ipl",
+            "teams"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:5030/api/ipl/teams' \\\n--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZiNjMwODUwNmY1YjJjNTUxZTY4YyIsInJvbGUiOiJzdXBlcl9hZG1pbiIsInR5cGUiOiJhZG1pbiIsImlhdCI6MTc4MDM5ODY5MiwiZXhwIjoxNzgwNDQxODkyfQ.Xf7Iw4daB7qHyVkeYmPt3GOJs1GnRJqP-07HeiX5gps' \\\n--form 'name=\"MI\"' \\\n--form 'full_name=\"Mumbai Indians\"' \\\n--form 'logo=@\"/Users/apple/Documents/ZImagegreotree/MI.png\"' \\\n--form 'tournament_id=\"6a1aa78be2f38bae9839ca84\"'"
+      },
+      "response": []
+    },
+    {
+      "name": "https://sanskar.geotree.xyz/api/plantation/occasions/update",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "key": "accept-language",
+            "value": "en-GB,en-US;q=0.9,en;q=0.8"
+          },
+          {
+            "key": "authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZWM4ZTgxNWUwMDZiMWQ4NzIxMGE1ZCIsInJvbGUiOiJzdXBlcl9hZG1pbiIsInR5cGUiOiJhZG1pbiIsImlhdCI6MTc4MDU2NTMzMCwiZXhwIjoxNzgwNjA4NTMwfQ._WeraLu3bAED1ggEGojciUA-G_eyvxbLh13Mma06RAQ"
+          },
+          {
+            "key": "content-type",
+            "value": "application/x-www-form-urlencoded"
+          },
+          {
+            "key": "origin",
+            "value": "https://geotree-admin.geoplanetsolution.com"
+          },
+          {
+            "key": "priority",
+            "value": "u=1, i"
+          },
+          {
+            "key": "referer",
+            "value": "https://geotree-admin.geoplanetsolution.com/"
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Chromium\";v=\"148\", \"Google Chrome\";v=\"148\", \"Not/A)Brand\";v=\"99\""
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?0"
+          },
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"macOS\""
+          },
+          {
+            "key": "sec-fetch-dest",
+            "value": "empty"
+          },
+          {
+            "key": "sec-fetch-mode",
+            "value": "cors"
+          },
+          {
+            "key": "sec-fetch-site",
+            "value": "cross-site"
+          },
+          {
+            "key": "user-agent",
+            "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "type": "text",
+              "key": "id",
+              "value": "6a1aab726c2810654919b051"
+            },
+            {
+              "type": "text",
+              "key": "form_fields",
+              "value": "[{\"label\":\"NAME\",\"key\":\"name\",\"field_type\":\"dropdown\",\"is_required\":true,\"placeholder\":\"\",\"options\":[\"label\"\"1\" ,\"value\":\"First Spark 🌟\" ]}]"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{geotreeLiveUrl}}/api/plantation/occasions/update",
+          "host": [
+            "{{geotreeLiveUrl}}"
+          ],
+          "path": [
+            "api",
+            "plantation",
+            "occasions",
+            "update"
+          ]
+        },
+        "description": "Generated from cURL: curl 'https://sanskar.geotree.xyz/api/plantation/occasions/update' \\\n  -X 'PUT' \\\n  -H 'accept: application/json, text/plain, */*' \\\n  -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \\\n  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZWM4ZTgxNWUwMDZiMWQ4NzIxMGE1ZCIsInJvbGUiOiJzdXBlcl9hZG1pbiIsInR5cGUiOiJhZG1pbiIsImlhdCI6MTc4MDU2NTMzMCwiZXhwIjoxNzgwNjA4NTMwfQ._WeraLu3bAED1ggEGojciUA-G_eyvxbLh13Mma06RAQ' \\\n  -H 'content-type: application/x-www-form-urlencoded' \\\n  -H 'origin: https://geotree-admin.geoplanetsolution.com' \\\n  -H 'priority: u=1, i' \\\n  -H 'referer: https://geotree-admin.geoplanetsolution.com/' \\\n  -H 'sec-ch-ua: \"Chromium\";v=\"148\", \"Google Chrome\";v=\"148\", \"Not/A)Brand\";v=\"99\"' \\\n  -H 'sec-ch-ua-mobile: ?0' \\\n  -H 'sec-ch-ua-platform: \"macOS\"' \\\n  -H 'sec-fetch-dest: empty' \\\n  -H 'sec-fetch-mode: cors' \\\n  -H 'sec-fetch-site: cross-site' \\\n  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36' \\\n  --data-raw 'id=6a1aab726c2810654919b051&form_fields=%5B%7B%22label%22%3A%22NAME%22%2C%22key%22%3A%22name%22%2C%22field_type%22%3A%22dropdown%22%2C%22is_required%22%3Atrue%2C%22placeholder%22%3A%22%22%2C%22options%22%3A%5B%221++-+First+Spark+%F0%9F%8C%9F+2++-+Growing+Together+%F0%9F%8C%B1+3++-+Strong+Beginnings+%F0%9F%92%AB%22%5D%2C%22_id%22%3A%226a1eab278ce00f3955088201%22%7D%5D'"
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "tournament_id",
+      "value": ""
+    }
+  ]
+}

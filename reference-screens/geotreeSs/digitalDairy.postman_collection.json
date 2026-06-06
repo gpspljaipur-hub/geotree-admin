@@ -1,0 +1,2404 @@
+{
+  "info": {
+    "_postman_id": "b06ff05f-a8c8-4993-a282-54f0ffdc5392",
+    "name": "digitalDairy",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "22687513"
+  },
+  "item": [
+    {
+      "name": "New Request",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "SendOtp",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"9887100116\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/users/send-otp",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "users",
+            "send-otp"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/users/send-otp' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"phone\": \"9887100116\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "Verify-otp",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://    localhost:3000/users/    verify-otp",
+          "protocol": "http",
+          "host": [
+            "    localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "users",
+            "    verify-otp"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://    localhost:3000/users/    verify-otp' \\--header 'Content-Type:     application/json' \\--data '{  \"phone\": \"9887000115\",  \"otp\": \"2016\"}"
+      },
+      "response": []
+    },
+    {
+      "name": "TeachersLogin",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "email",
+              "value": "Nousar@gmail.com",
+              "type": "text"
+            },
+            {
+              "key": "password",
+              "value": "123456",
+              "type": "text",
+              "uuid": "3b35f5f0-94b6-419b-90a7-23be702351c7"
+            }
+          ]
+        },
+        "url": {
+          "raw": "https://digitaldiry-backend.onrender.com/teachers/login",
+          "protocol": "https",
+          "host": [
+            "digitaldiry-backend",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "teachers",
+            "login"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://    localhost:3000/teachers/    login' \\--header 'Content-Type:     application/json' \\--data-raw '{  \"email\": \"rajatr@gmail.com\",  \"password\": \"123456\"}"
+      },
+      "response": []
+    },
+    {
+      "name": "TeachersAdd",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Rajatssss\",\n  \"email\": \"rajatr@gmail.com\",\n  \"schoolName\": \"ABC School\",\n  \"password\": \"123456\",\n  \"subject\": \"Math\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/teachers/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "teachers",
+            "add"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/teachers/add' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\n  \"name\": \"Rajatssss\",\n  \"email\": \"rajatr@gmail.com\",\n  \"schoolName\": \"ABC School\",\n  \"password\": \"123456\",\n  \"subject\": \"Math\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "StudentsAdd",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{  \"name\": \"akash\",  \"className\": \"6\",  \"teacherId\":\"69f1b3905eeb168a81e42e81\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://digitaldiry-backend.onrender.com/students/add",
+          "protocol": "https",
+          "host": [
+            "digitaldiry-backend",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "students",
+            "add"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://    localhost:3000/students/    add' \\--header 'Content-Type:     application/json' \\--data '{  \"name\": \"akash\",  \"className\": \"6\",  \"teacherId\":     \"69f1b3905eeb168a81e42e81\"}'"
+      },
+      "response": []
+    },
+    {
+      "name": "StudentsList",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"teacherId\": \"69f1ce037480b82d53d50683\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://digitaldiry-backend.onrender.com/students/list",
+          "protocol": "https",
+          "host": [
+            "digitaldiry-backend",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "students",
+            "list"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://    localhost:3000/students/    list' \\--header 'Content-Type:     application/json' \\--data '{  \"teacherId\":     \"69f1b3905eeb168a81e42e81\"}'"
+      },
+      "response": []
+    },
+    {
+      "name": "AttendanceList",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/attendance/list",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "attendance",
+            "list"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/attendance/list' \\\n--header 'Content-Type: application/json' \\\n--data ' {\n  \"teacherId\": \"69f1b3905eeb168a81e42e81\",\n  \"date\": \"2026-04-29\"\n}"
+      },
+      "response": []
+    },
+    {
+      "name": "AttendanceMark",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"studentId\": \"69f1cb273d72c06a94d5069f\",\n  \"teacherId\": \"69f1b3905eeb168a81e42e81\",\n  \"status\": \"present\",\n  \"date\": \"2026-04-29\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/attendance/mark",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "attendance",
+            "mark"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/attendance/mark' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"studentId\": \"69f1cb273d72c06a94d5069f\",\n  \"teacherId\": \"69f1b3905eeb168a81e42e81\",\n  \"status\": \"present\",\n  \"date\": \"2026-04-29\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "ClassesAdd",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://    localhost:3000/classes/    add",
+          "protocol": "http",
+          "host": [
+            "    localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "classes",
+            "    add"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://    localhost:3000/classes/    add' \\--header 'Content-Type:     application/json' \\--data '{  \"name\": \"Class 8\"}"
+      },
+      "response": []
+    },
+    {
+      "name": "ClassesAll",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/classes/all",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "classes",
+            "all"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/classes/all'"
+      },
+      "response": []
+    },
+    {
+      "name": "SubjectsAdd",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Math\",\n  \"classId\": \"69f1d447e85c0ecfe252699a\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/subjects/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "subjects",
+            "add"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/subjects/add' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"name\": \"Math\",\n  \"classId\": \"69f1d447e85c0ecfe252699a\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "SubjectsList",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://    localhost:3000/subjects/    list",
+          "protocol": "http",
+          "host": [
+            "    localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "subjects",
+            "    list"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://    localhost:3000/subjects/    list' \\--header 'Content-Type:     application/json' \\--data '{  \"classId\":     \"69f1d447e85c0ecfe252699a\"}"
+      },
+      "response": []
+    },
+    {
+      "name": "homeworkAdd",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"classId\": \"69f1d447e85c0ecfe252699a\",\n  \"subjectId\": \"69f1d49ce85c0ecfe252699d\",\n  \"message\": \"Do exercise 1 to 5\",\n  \"date\": \"2026-04-29\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/homework/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "homework",
+            "add"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/homework/add' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"classId\": \"69f1d447e85c0ecfe252699a\",\n  \"subjectId\": \"69f1d49ce85c0ecfe252699d\",\n  \"message\": \"Do exercise 1 to 5\",\n  \"date\": \"2026-04-29\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "HomeworkList",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"classId\": \"69f1d447e85c0ecfe252699a\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/homework/list",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "homework",
+            "list"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/homework/list' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"classId\": \"69f1d447e85c0ecfe252699a\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "MarksAdd",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"classId\": \"69f1d447e85c0ecfe252699a\",\n  \"subjectId\": \"69f1d49ce85c0ecfe252699d\",\n  \"students\": [\n    {\n      \"studentId\": \"69f1d49ce85c0ecfe252699d\",\n      \"marks\": 85\n    },\n    {\n      \"studentId\": \"69f1c7fbb80270ca7489263b\",\n      \"marks\": 72\n    }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/marks/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "marks",
+            "add"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/marks/add' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"classId\": \"69f1d447e85c0ecfe252699a\",\n  \"subjectId\": \"69f1d49ce85c0ecfe252699d\",\n  \"students\": [\n    {\n      \"studentId\": \"69f1d49ce85c0ecfe252699d\",\n      \"marks\": 85\n    },\n    {\n      \"studentId\": \"69f1c7fbb80270ca7489263b\",\n      \"marks\": 72\n    }\n  ]\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "NoticeAdd",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Exam Notice\",\n  \"classId\": \"69f1d447e85c0ecfe252699a\",\n  \"message\": \"Exam will start from Monday\",\n  \"status\": \"important\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/notice/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "notice",
+            "add"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/notice/add' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"title\": \"Exam Notice\",\n  \"classId\": \"69f1d447e85c0ecfe252699a\",\n  \"message\": \"Exam will start from Monday\",\n  \"status\": \"important\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "NoticeList",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"classId\": \"69f1d447e85c0ecfe252699a\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/notice/list",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "notice",
+            "list"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/notice/list' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"classId\": \"69f1d447e85c0ecfe252699a\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "Registerget",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://    localhost:3000/register/    get",
+          "protocol": "http",
+          "host": [
+            "    localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "register",
+            "    get"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://    localhost:3000/register/    get' \\--header 'Content-Type:     application/json' \\--data '{  \"mobile\": \"9887000116\"}"
+      },
+      "response": []
+    },
+    {
+      "name": "RelationAdd",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"Uncle\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/relation/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "relation",
+            "add"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/relation/add' \\\n--header 'Content-Type: application/json' \\\n--data '{\n    \"name\": \"Uncle\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "RelationList",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/relation/list",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "relation",
+            "list"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "SchoolAdd",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\" : \"nsjfnkzxdc school\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/school/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "school",
+            "add"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/school/add' \\\n--header 'Content-Type: application/json' \\\n--data '{\n    \"name\" : \"nsjfnkzxdc school\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "SchoolList",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/school/list",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "school",
+            "list"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/school/list'"
+      },
+      "response": []
+    },
+    {
+      "name": "RegisterParentAdd",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"mobile\": \"9887000116\",\n  \"parentName\": \"Rajat\",\n  \"studentFullName\": \"Aman\",\n  \"classId\": \"69f1d447e85c0ecfe252699a\",\n  \"schoolId\": \"69f2f2bc9a94493d7270b1d8\",\n  \"relationId\": \"69f2f3049a94493d7270b1de\",\n  \"studentId\": \"69f1d49ce85c0ecfe252699d\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/register/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "register",
+            "add"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/register/add' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"mobile\": \"9887000116\",\n  \"parentName\": \"Rajat\",\n  \"studentFullName\": \"Aman\",\n  \"classId\": \"69f1d447e85c0ecfe252699a\",\n  \"schoolId\": \"69f2f2bc9a94493d7270b1d8\",\n  \"relationId\": \"69f2f3049a94493d7270b1de\",\n  \"studentId\": \"69f1d49ce85c0ecfe252699d\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "StudentsListbyclass",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"classId\": \"69f1d44de85c0ecfe252699b\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{LiveUrl}}students/list-by-class",
+          "host": [
+            "{{LiveUrl}}students"
+          ],
+          "path": [
+            "list-by-class"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/students/list-by-class' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"classId\": \"69f1d44de85c0ecfe252699b\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "AttendanceStudentMonthly",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"classId\": \"69f1d44de85c0ecfe252699b\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/students/list-by-class",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "students",
+            "list-by-class"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/students/list-by-class' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"classId\": \"69f1d44de85c0ecfe252699b\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "LeaveApply",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"studentId\": \"69f2ff40c351f7856036e605\",\n  \"startDate\": \"2026-05-01\",\n  \"endDate\": \"2026-05-03\",\n  \"message\": \"Fever\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/leave/apply",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "leave",
+            "apply"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/leave/apply' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"studentId\": \"69f2ff40c351f7856036e605\",\n  \"startDate\": \"2026-05-01\",\n  \"endDate\": \"2026-05-03\",\n  \"message\": \"Fever\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "LeaveList",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"studentId\": \"69f2ff40c351f7856036e605\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/leave/list",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "leave",
+            "list"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/leave/list' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"studentId\": \"69f2ff40c351f7856036e605\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "ComplaintCategoryList",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/complaint-category/list",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "complaint-category",
+            "list"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/complaint-category/list'"
+      },
+      "response": []
+    },
+    {
+      "name": "ComplaintCategoryAdd",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Fees Issue\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/complaint-category/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "complaint-category",
+            "add"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/complaint-category/add' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"name\": \"Fees Issue\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "ComplaintAdd",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"categoryId\": \"69f32085bb036e6441a34eca\",\n  \"message\": \"Bus is always late\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/complaint/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "complaint",
+            "add"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/complaint/add' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"categoryId\": \"69f32085bb036e6441a34eca\",\n  \"message\": \"Bus is always late\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "ComplainLlist",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{LiveUrl}}complaint/list",
+          "host": [
+            "{{LiveUrl}}complaint"
+          ],
+          "path": [
+            "list"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/complaint/list'"
+      },
+      "response": []
+    },
+    {
+      "name": "MarksList",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://    localhost:3000/marks/    list",
+          "protocol": "http",
+          "host": [
+            "    localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "marks",
+            "    list"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://    localhost:3000/marks/    list' \\--header 'Content-Type:     application/json' \\--data '{  \"classId\":     \"69f1d447e85c0ecfe252699a\"    ,  \"subjectId\":     \"69f1d49ce85c0ecfe252699d\"}"
+      },
+      "response": []
+    },
+    {
+      "name": "RegisterParentUpdate",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://    localhost:3000/complaint/    list",
+          "protocol": "http",
+          "host": [
+            "    localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "complaint",
+            "    list"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://    localhost:3000/complaint/    list' \\--header 'Content-Type:     application/json' \\--data '{  \"mobile\": \"9887000116\",  \"parentName\": \"Rajat\",  \"studentFullName\": \"Aman\",  \"classId\":     \"69f1d447e85c0ecfe252699a\"    ,  \"schoolId\":     \"69f2f2bc9a94493d7270b1d8\"    ,  \"relationId\":     \"69f2f3049a94493d7270b1de\"    ,  \"studentId\":     \"69f1d49ce85c0ecfe252699d\"}"
+      },
+      "response": []
+    },
+    {
+      "name": "examType/list",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/examType/list",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "examType",
+            "list"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/examType/list'"
+      },
+      "response": []
+    },
+    {
+      "name": "subjects/teacher-subjects",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"teacherId\": \"69fdba8b98a0b1bbcd501271\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/subjects/teacher-subjects",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "subjects",
+            "teacher-subjects"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/subjects/teacher-subjects' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"teacherId\": \"69fdba8b98a0b1bbcd501271\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "teacher-schedule/teacher",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"teacherId\": \"69fdba8b98a0b1bbcd501271\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/teacher-schedule/teacher",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "teacher-schedule",
+            "teacher"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/teacher-schedule/teacher' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"teacherId\": \"69fdba8b98a0b1bbcd501271\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "teacher-schedule/list",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/teacher-schedule/list",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "teacher-schedule",
+            "list"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/teacher-schedule/list'"
+      },
+      "response": []
+    },
+    {
+      "name": "Register/list",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/register/list",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "register",
+            "list"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/register/list'"
+      },
+      "response": []
+    },
+    {
+      "name": "chat/history",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"senderId\": \"6a019b33179983949b12b89e\",\n  \"receiverId\": \"69fdba8b98a0b1bbcd501271\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/chat/history",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "chat",
+            "history"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/chat/history' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"senderId\": \"6a019b33179983949b12b89e\",\n  \"receiverId\": \"69fdba8b98a0b1bbcd501271\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "teachers/login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\":\"soni@gmail.com\",\n    \"password\":\"123456\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/teachers/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "teachers",
+            "login"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/teachers/login' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\n    \"email\":\"soni@gmail.com\",\n    \"password\":\"123456\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "New Request",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "New Request",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Homework/list",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"classId\": \"69f1d447e85c0ecfe252699a\",\n  \"subjectId\": \"69f495265a63fe9bda6b291f\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/homework/list",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "homework",
+            "list"
+          ]
+        },
+        "description": "Generated from cURL: curl --location 'http://localhost:3000/homework/list' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"classId\": \"69f1d447e85c0ecfe252699a\",\n  \"subjectId\": \"69f495265a63fe9bda6b291f\"\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "marks/add",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"classId\": \"69f1d447e85c0ecfe252699a\",\n  \"subjectId\": \"69f495265a63fe9bda6b291f\",\n  \"examTypeId\": \"69fd96648a8f40e900b1bd06\",\n\n  \"students\": [\n    {\n      \"studentId\": \"69f4966c5a63fe9bda6b292b\",\n      \"marks\": 98\n    }\n   \n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/marks/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "marks",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "register/add",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"mobile\": \"9887988722\",\n  \"parentName\": \"anuj Sharma\",\n  \n  \"relationId\": \"69f2f2f59a94493d7270b1db\",\n  \"email\": \"vcshjvads@gmail.com\",\n  \"address\": \"Jaipur Rajasthan\",\n  \"students\": [\n    {\n      \"studentId\": \"69f496805a63fe9bda6b292e\",\n      \"classId\": \"69f1d447e85c0ecfe252699a\",\n      \"schoolId\": \"6a01ab9c9609ee4c9952f532\"\n    },\n    {\n      \"studentId\": \"69f496905a63fe9bda6b292f\",\n      \"classId\": \"69f1d452e85c0ecfe252699c\",\n      \"schoolId\": \"6a02c191fbf298e1db5067f6\"\n    }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://digitaldiry-backend.onrender.com/register/add",
+          "protocol": "https",
+          "host": [
+            "digitaldiry-backend",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "register",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "notice/add",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "type": "text",
+              "key": "title",
+              "value": "Holiday Notice"
+            },
+            {
+              "type": "text",
+              "key": "message",
+              "value": "Tomorrow school will remain closed"
+            },
+            {
+              "type": "text",
+              "key": "status",
+              "value": "important"
+            },
+            {
+              "type": "text",
+              "key": "classId",
+              "value": "69f1d447e85c0ecfe252699a"
+            },
+            {
+              "type": "text",
+              "key": "classId",
+              "value": "69f1d44de85c0ecfe252699b"
+            },
+            {
+              "type": "file",
+              "key": "files",
+              "src": [
+                "/Users/apple/Downloads/4022XXXXXXXXXX28_01-04-2026_153.pdf",
+                "/Users/apple/Downloads/ChatGPT Image Mar 9, 2026, 04_29_17 PM.png"
+              ]
+            },
+            {
+              "type": "file",
+              "key": "files",
+              "value": null,
+              "disabled": true
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:3000/notice/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "notice",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "homework/update",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "type": "text",
+              "key": "id",
+              "value": "6a0417dcc78848f81174a54e"
+            },
+            {
+              "type": "text",
+              "key": "message",
+              "value": "cadsdffddsa Homework"
+            },
+            {
+              "type": "text",
+              "key": "isImportant",
+              "value": "true"
+            },
+            {
+              "type": "text",
+              "key": "date",
+              "value": "2026-05-13"
+            },
+            {
+              "type": "file",
+              "key": "files",
+              "value": null
+            },
+            {
+              "key": "teacherId",
+              "value": "69fdba8b98a0b1bbcd501271",
+              "type": "text",
+              "uuid": "acc2fd18-f186-4330-99b7-1264ef99f4e2"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:3000/homework/update",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "homework",
+            "update"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "chat/send",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"conversationId\": \"69ff235dcf3115830f51dabc\",\n  \"senderId\": \"69f496765a63fe9bda6b292c\",\n  \"senderType\": \"parent\",\n  \"receiverId\": \"69ff1f1bcf3115830f51d500\",\n  \"message\": \"Hello Sir how can i help you\" ,\n  \"messageType\": \"text\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/chat/send",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "chat",
+            "send"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "complaint/add",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "type": "text",
+              "key": "categoryId",
+              "value": "69f32085bb036e6441a34eca"
+            },
+            {
+              "type": "text",
+              "key": "message",
+              "value": "Bus is always late and i m too lategjygu"
+            },
+            {
+              "type": "text",
+              "key": "studentId",
+              "value": "69f496765a63fe9bda6b292c"
+            },
+            {
+              "type": "text",
+              "key": "classId",
+              "value": "69f1d447e85c0ecfe252699a"
+            },
+            {
+              "type": "file",
+              "key": "files",
+              "src": "/Users/apple/Downloads/laboratory-microscope-test-icon.png"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:3000/complaint/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "complaint",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "academic-calendar/delete",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": \"69feda85814e36bd78c937ec\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/academic-calendar/delete",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "academic-calendar",
+            "delete"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "academic-calendar/month-events",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"month\":2, \n  \"year\": 2026\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/academic-calendar/month-events",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "academic-calendar",
+            "month-events"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "academic-calendar/add",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Good Friday\",\n  \"type\": \"holiday\",\n  \"date\": \"2026-04-10\",\n  \"location\": \"Public Holiday\",\n  \"description\": \"School holiday\",\n  \"color\": \"#22C55E\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/academic-calendar/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "academic-calendar",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "teachers/update",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "type": "text",
+              "key": "teacherId",
+              "value": "69fdba8b98a0b1bbcd501271"
+            },
+            {
+              "type": "text",
+              "key": "name",
+              "value": "Rajat Soni"
+            },
+            {
+              "type": "text",
+              "key": "email",
+              "value": "soni@gmail.com"
+            },
+            {
+              "type": "text",
+              "key": "phone",
+              "value": "9876543210"
+            },
+            {
+              "type": "text",
+              "key": "qualification",
+              "value": "MCA"
+            },
+            {
+              "type": "text",
+              "key": "experience",
+              "value": "5 Years"
+            },
+            {
+              "type": "text",
+              "key": "subjectIds",
+              "value": "69f4951a5a63fe9bda6b291e"
+            },
+            {
+              "type": "text",
+              "key": "subjectIds",
+              "value": "69f495265a63fe9bda6b291f"
+            },
+            {
+              "type": "text",
+              "key": "classIds",
+              "value": "69f1d447e85c0ecfe252699a"
+            },
+            {
+              "type": "text",
+              "key": "classIds",
+              "value": "69f1d44de85c0ecfe252699b"
+            },
+            {
+              "type": "file",
+              "key": "image",
+              "src": "/Users/apple/Downloads/ChatGPT Image Mar 9, 2026, 04_29_17 PM.png"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:3000/teachers/update",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "teachers",
+            "update"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "teacher-schedule/teacher",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"teacherId\": \"69fdba8b98a0b1bbcd501271\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/teacher-schedule/teacher",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "teacher-schedule",
+            "teacher"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "teacher-schedule/add",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"teacherId\": \"69fdba8b98a0b1bbcd501271\",\n  \"subjectId\": \"69f4951a5a63fe9bda6b291e\",\n  \"classId\": \"69f1d447e85c0ecfe252699a\",\n  \"date\": \"2026-05-10\",\n  \"time\": \"09:00 AM-11.00AM\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/teacher-schedule/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "teacher-schedule",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "subjects/teacher-subjects",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"teacherId\": \"69fdba8b98a0b1bbcd501271\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/subjects/teacher-subjects",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "subjects",
+            "teacher-subjects"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "teachers/add",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Nousar ji\",\n  \"email\": \"nousarg@gmail.com\",\n  \"password\": \"123456\",\n\"schoolId\" : \"6a0d447631996d6d9592cc75\",\n  \"subjectIds\": [\"6a0d9608a3cd15005933aff4\"],\n  \"classIds\": [\"6a0d9560a3cd15005933aff3\"]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/teachers/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "teachers",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "marks/add",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/marks/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "marks",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "examType/list",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/examType/list",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "examType",
+            "list"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "examType/add",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "key": "content-type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\":\"2nd term\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/examType/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "examType",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "homework/update",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer YOUR_TOKEN"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "type": "text",
+              "key": "classId",
+              "value": "6a0d45ce31996d6d9592cc8b"
+            },
+            {
+              "type": "text",
+              "key": "subjectId",
+              "value": "6a0d46c331996d6d9592ccba"
+            },
+            {
+              "type": "text",
+              "key": "teacherId",
+              "value": "6a0d472be8e1cc4d9f9b3693"
+            },
+            {
+              "type": "text",
+              "key": "message",
+              "value": "Complete chapter 5 exercises also add chapter 3"
+            },
+            {
+              "type": "text",
+              "key": "date",
+              "value": "2026-05-20"
+            },
+            {
+              "type": "text",
+              "key": "isImportant",
+              "value": "true"
+            },
+            {
+              "type": "file",
+              "key": "files",
+              "value": null
+            },
+            {
+              "type": "file",
+              "key": "files",
+              "value": null
+            },
+            {
+              "key": "id",
+              "value": "6a0d496ce8e1cc4d9f9b3694",
+              "type": "text",
+              "uuid": "e423f1b4-3f97-40b5-9dbc-5f3eb03d03fa"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:3000/homework/update",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "homework",
+            "update"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "students/add",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{  \"name\": \"ayus sharma\", \n\"classId\": \"6a0d45ce31996d6d9592cc8b\",\n \"schoolId\": \"6a0d449831996d6d9592cc77\",\n\"teacherId\":\"6a0d472be8e1cc4d9f9b3693\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/students/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "students",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "students/school-class-students",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"schoolId\": \"6a0d449831996d6d9592cc77\",\n  \"classId\": \"6a0d45ce31996d6d9592cc8b\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/students/school-class-students",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "students",
+            "school-class-students"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "students/list-by-class",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"schoolId\": \"6a0d449831996d6d9592cc77\",\n  \"classId\": \"6a0d45ce31996d6d9592cc8b\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/students/list-by-class",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "students",
+            "list-by-class"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "classes/school-classes",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"schoolId\": \"6a0d447631996d6d9592cc75\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/classes/school-classes",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "classes",
+            "school-classes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "classes/add",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\"name\":\"class 11\",\n\"schoolId\":\"6a0d447631996d6d9592cc75\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/classes/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "classes",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "subjects/add",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Math\",\n  \"classId\": \"6a0d9560a3cd15005933aff3\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/subjects/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "subjects",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "notice/add",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer YOUR_TOKEN"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "type": "text",
+              "key": "title",
+              "value": "Holiday Notice"
+            },
+            {
+              "type": "text",
+              "key": "classId",
+              "value": "6a0d9560a3cd15005933aff3"
+            },
+            {
+              "type": "text",
+              "key": "message",
+              "value": "Tomorrow school will remain closed"
+            },
+            {
+              "type": "text",
+              "key": "status",
+              "value": "important"
+            },
+            {
+              "type": "file",
+              "key": "files",
+              "src": "/Users/apple/Downloads/Laboratory-amico.png"
+            },
+            {
+              "type": "file",
+              "key": "files",
+              "value": null
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:3000/notice/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "notice",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "notice/all",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/notice/all",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "notice",
+            "all"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
