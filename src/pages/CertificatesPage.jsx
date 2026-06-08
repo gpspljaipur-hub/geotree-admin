@@ -100,8 +100,8 @@ export default function CertificatesPage() {
         display_id: item.certificate_id || item._id,
         user: item.user_id?.name || item.user_name || "Unknown User",
         phone: item.user_id?.mobile || item.user_id?.email || item.user_mobile || "N/A",
-        trees: `${item.trees_count || 1} Trees`,
-        site: item.site_name || "Unknown Site",
+        trees: `${item.trees_count || item.plantation_id?.trees_count || 1} Trees`,
+        site: item.site_name || item.plantation_id?.site_name || "Unknown Site",
         category: item.category || item.plantation_source || "PLANTATION",
         date: new Date(item.created_at || item.createdAt || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
         original: item
@@ -122,6 +122,39 @@ export default function CertificatesPage() {
   const handlePreview = (row) => {
     setSelectedCert(row)
     setPreviewOpen(true)
+  }
+
+  const handleOpenNewTab = () => {
+    if (!selectedCert) return;
+    const htmlContent = generateCertificateHTML({
+      recipient: selectedCert.user,
+      qty: selectedCert.original?.trees_count || selectedCert.original?.plantation_id?.trees_count || 1,
+      site: selectedCert.original?.site_name || selectedCert.original?.plantation_id?.site_name || "Unknown Site",
+      issueDate: selectedCert.date,
+      certId: selectedCert.display_id,
+    });
+    
+    const newWindow = window.open('', '_blank');
+    if (newWindow) {
+      newWindow.document.write(`
+        <html>
+          <head>
+            <title>Certificate - ${selectedCert.display_id}</title>
+            <base href="${window.location.origin}" />
+            <style>
+              body { margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #f1f5f9; }
+              .cert-container { width: 100%; max-width: 1130px; aspect-ratio: 1.414/1; background: white; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+            </style>
+          </head>
+          <body>
+            <div class="cert-container">
+              ${htmlContent}
+            </div>
+          </body>
+        </html>
+      `);
+      newWindow.document.close();
+    }
   }
 
   const handleEdit = (row) => {
@@ -227,12 +260,18 @@ export default function CertificatesPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <Badge tone="pink">{selectedCert.display_id}</Badge>
               <div className="flex items-center gap-3">
-                <button className="min-h-[40px] px-5 text-[10px] font-bold tracking-widest text-gray-600 bg-white border border-gray-200 rounded-[10px] hover:bg-gray-50 transition-colors cursor-pointer uppercase" type="button">NEW TAB</button>
+                <button className="min-h-[40px] px-5 text-[10px] font-bold tracking-widest text-gray-600 bg-white border border-gray-200 rounded-[10px] hover:bg-gray-50 transition-colors cursor-pointer uppercase" type="button" onClick={handleOpenNewTab}>NEW TAB</button>
                 <button className="min-h-[40px] px-5 text-[10px] font-bold tracking-widest text-gray-600 bg-white border border-gray-200 rounded-[10px] hover:bg-gray-50 transition-colors cursor-pointer uppercase" type="button">PRINT</button>
                 <button className="inline-flex items-center justify-center gap-2 min-h-[40px] px-5 bg-blue text-white text-[10px] font-bold tracking-widest rounded-[10px] border-0 cursor-pointer hover:bg-indigo transition-colors uppercase" type="button"><Icon name="download" size={16} />DOWNLOAD PDF</button>
               </div>
             </div>
-            <CertificatePreview />
+            <CertificatePreview values={{
+              recipient: selectedCert.user,
+              qty: selectedCert.original?.trees_count || selectedCert.original?.plantation_id?.trees_count || 1,
+              site: selectedCert.original?.site_name || selectedCert.original?.plantation_id?.site_name || "Unknown Site",
+              issueDate: selectedCert.date,
+              certId: selectedCert.display_id,
+            }} />
           </section>
         </div>
       )}
@@ -240,20 +279,42 @@ export default function CertificatesPage() {
   )
 }
 
+import geoTreeLogo from '../assets/Geotree logo.png'
+import centerLogo from '../assets/geo_logo.png'
+
 export const generateCertificateHTML = (values = {}) => {
-  const color = values.primaryColor || '#d97706';
+  let color = values.primaryColor || '#d97706';
+  if (color.includes('Green')) color = '#2E8B57';
+  else if (color.includes('Blue')) color = '#0284c7';
+  else if (color.includes('Orange')) color = '#ea580c';
+  else if (color.includes('Purple')) color = '#7c3aed';
+  else if (color.includes('Grey') || color.includes('Gray')) color = '#475569';
   const title = values.title || 'ENVIRONMENTAL IMPACT AWARD';
   const subTitle = values.subTitle || 'TEAM CONTRIBUTION RECOGNITION';
   const recipient = values.recipient || 'John Doe';
-  const description = values.description || 'Thank you John Doe for your incredible support. By helping us manage the plantation of 50 trees at Thar Desert Restoration, you are a vital part of our mission.';
+  
+  const rawDescription = values.description || 'Thank you {{recipient}} for your incredible support. By helping us manage the plantation of {{qty}} trees at {{site}}, you are a vital part of our mission.';
+  const description = rawDescription
+    .replace(/{{recipient}}/g, recipient)
+    .replace(/{{qty}}/g, values.qty || '50')
+    .replace(/{{site}}/g, values.site || 'Thar Desert Restoration')
+    .replace(/{{occasion}}/g, values.occasion || '[Occasion Name]')
+    .replace(/{{tournament}}/g, values.tournament || '[Tournament]')
+    .replace(/{{match}}/g, values.match || '[Match Name]')
+    .replace(/{{issue_date}}/g, values.issueDate || '6/8/2026')
+    .replace(/{{event_date}}/g, values.eventDate || '6/8/2026')
+    .replace(/{{match_date}}/g, values.matchDate || '6/8/2026')
+    .replace(/{{date}}/g, values.issueDate || '6/8/2026')
+    .replace(/{{dot_balls}}/g, values.dotBalls || '150');
+    
   const tagline = values.tagline || 'Nurturing a greener and more sustainable future';
-  const issueDate = values.issueDate || '6/6/2026';
+  const issueDate = values.issueDate || '6/8/2026';
   const certId = values.certId || '6a1ea5388ce00f39550881c8';
 
   return `
     <div style="width: 100%; height: 100%; min-height: 480px; padding: 10px; background: #fdfdfd; box-sizing: border-box; font-family: sans-serif;">
       <div style="border: 3px solid ${color}; height: 100%; width: 100%; box-sizing: border-box; padding: 5px;">
-        <div style="position: relative; border: 1px solid ${color}; height: 100%; box-sizing: border-box; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: #fff;">
+        <div style="position: relative; border: 1px solid ${color}; height: 100%; box-sizing: border-box; padding: 70px 40px 40px 40px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; background: #fff;">
           
           <!-- corners -->
           <div style="position: absolute; top: 15px; left: 15px; width: 40px; height: 40px; border-top: 1px solid ${color}; border-left: 1px solid ${color};"></div>
@@ -262,34 +323,34 @@ export const generateCertificateHTML = (values = {}) => {
           <div style="position: absolute; bottom: 15px; right: 15px; width: 40px; height: 40px; border-bottom: 1px solid ${color}; border-right: 1px solid ${color};"></div>
 
           <!-- Header -->
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; margin-bottom: 30px;">
-             <div style="font-size:20px; font-weight:900; color:#2c3e50; letter-spacing:-1px;">
-               <span style="color:#27ae60;">Geo</span><span style="color:#2c3e50;">Tree</span>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; margin-bottom: 0;">
+             <div style="flex: 1; text-align: left; display: flex; align-items: center;">
+               <img src="${geoTreeLogo}" alt="GeoTree" style="height: 38px; object-fit: contain;" />
              </div>
-             <div style="width: 34px; height: 34px; border-radius: 50%; border: 3px solid #8cc63f; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; transform: rotate(-15deg);">
-                <div style="width: 2px; height: 100%; background: #3498db; position: absolute; transform: rotate(45deg);"></div>
-                <div style="width: 100%; height: 2px; background: #3498db; position: absolute; transform: rotate(45deg);"></div>
-                <div style="color: #8cc63f; font-weight: 900; font-size: 22px; position: relative; z-index: 10;">G</div>
+             <div style="flex: 1; display: flex; justify-content: center;">
+                <img src="${centerLogo}" alt="Globe" style="height: 48px; object-fit: contain;" />
              </div>
-             <div style="text-align: right; font-family: sans-serif; font-size: 9px; color: #95a5a6; font-weight: bold; line-height: 1.6; letter-spacing: 1px;">
+             <div style="flex: 1; text-align: right; font-family: sans-serif; font-size: 11px; color: #95a5a6; font-weight: bold; line-height: 1.6; letter-spacing: 1px;">
                ISSUED DATE: <span style="color: #2c3e50;">${issueDate}</span><br/>
                CERTIFICATE ID: <span style="color: #2c3e50;">${certId}</span>
              </div>
           </div>
 
-          <!-- Content -->
-          <h1 style="font-family: Georgia, serif; font-size: 28px; color: #1a252f; letter-spacing: 3px; text-transform: uppercase; margin: 0 0 8px 0; max-width: 90%; line-height: 1.2;">${title}</h1>
-          <h2 style="font-family: sans-serif; font-size: 11px; color: #7f8c8d; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 25px 0;">${subTitle}</h2>
+          <div style="margin-top: 45px; width: 100%;">
+            <!-- Content -->
+            <h1 style="font-family: Georgia, serif; font-size: 36px; color: #1a252f; letter-spacing: 3px; text-transform: uppercase; margin: 0 0 10px 0; max-width: 90%; line-height: 1.2; margin-left: auto; margin-right: auto;">${title}</h1>
+          <h2 style="font-family: sans-serif; font-size: 14px; color: #7f8c8d; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 35px 0;">${subTitle}</h2>
 
-          <p style="font-family: Georgia, serif; font-size: 15px; font-style: italic; color: #5a6672; margin: 0 0 8px 0;">This is proudly presented to</p>
-          <div style="display: inline-block; border-bottom: 2px solid ${color}; padding-bottom: 2px; margin-bottom: 20px;">
-            <h3 style="font-family: Georgia, serif; font-size: 34px; color: #0f172a; margin: 0; font-weight: bold;">${recipient}</h3>
+          <p style="font-family: Georgia, serif; font-size: 18px; font-style: italic; color: #5a6672; margin: 0 0 10px 0;">This is proudly presented to</p>
+          <div style="display: inline-block; border-bottom: 2px solid ${color}; padding-bottom: 4px; margin-bottom: 25px;">
+            <h3 style="font-family: Georgia, serif; font-size: 48px; color: #0f172a; margin: 0; font-weight: bold;">${recipient}</h3>
           </div>
 
-          <p style="font-family: sans-serif; font-size: 13px; color: #475569; line-height: 1.6; max-width: 85%; margin: 0 auto 25px auto;">${description}</p>
+          <p style="font-family: sans-serif; font-size: 16px; color: #475569; line-height: 1.6; max-width: 85%; margin: 0 auto 30px auto;">${description}</p>
 
-          <p style="font-family: sans-serif; font-size: 13px; font-weight: bold; font-style: italic; color: #4c82b4; margin: 0;">${tagline}</p>
-          <div style="width: 120px; height: 1px; background: #cbd5e1; margin-top: 15px;"></div>
+          <p style="font-family: sans-serif; font-size: 16px; font-weight: bold; font-style: italic; color: #4c82b4; margin: 0;">${tagline}</p>
+          <div style="width: 120px; height: 1px; background: #cbd5e1; margin-top: 15px; margin-left: auto; margin-right: auto;"></div>
+          </div>
         </div>
       </div>
     </div>

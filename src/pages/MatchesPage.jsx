@@ -19,31 +19,28 @@ export default function MatchesPage() {
   const [totalPages, setTotalPages] = useState(1)
 
   useEffect(() => {
-    fetchData()
+    fetchMatches()
   }, [page])
 
-  const fetchData = async () => {
+  useEffect(() => {
+    fetchTournaments()
+  }, [])
+
+  useEffect(() => {
+    if (formValues[0]) {
+      fetchTeams(formValues[0])
+    } else {
+      setTeams([])
+    }
+  }, [formValues[0]])
+
+  const fetchMatches = async () => {
     try {
       setLoading(true)
-      const [res, toursRes, teamsRes] = await Promise.all([
-        apiService.getMatches({ page, limit: 10 }),
-        apiService.getTournaments({ page: 1, limit: 100 }),
-        apiService.getTeams({ page: 1, limit: 100 })
-      ])
+      const res = await apiService.getMatches({ page, limit: 10 })
       
       if (res?.pagination) setTotalPages(res.pagination.pages || 1)
       const dataList = res?.data?.data || res?.data || (Array.isArray(res) ? res : [])
-      
-      let tList = toursRes?.data?.data || toursRes?.data || []
-      if (!Array.isArray(tList) && tList.docs) tList = tList.docs
-      if (!Array.isArray(tList)) tList = []
-      
-      let teamList = teamsRes?.data?.data || teamsRes?.data || []
-      if (!Array.isArray(teamList) && teamList.docs) teamList = teamList.docs
-      if (!Array.isArray(teamList)) teamList = []
-      
-      setTournaments(tList)
-      setTeams(teamList)
       
       const mappedRows = dataList.map((st, index) => ({
         id: st._id || st.id || `MatchesPage-${index}`,
@@ -64,6 +61,30 @@ export default function MatchesPage() {
     }
   }
 
+  const fetchTournaments = async () => {
+    try {
+      const toursRes = await apiService.getTournaments({ page: 1, limit: 100 })
+      let tList = toursRes?.data?.data || toursRes?.data || []
+      if (!Array.isArray(tList) && tList.docs) tList = tList.docs
+      if (!Array.isArray(tList)) tList = []
+      setTournaments(tList)
+    } catch (err) {
+      console.error("Error fetching tournaments:", err)
+    }
+  }
+
+  const fetchTeams = async (tournamentId) => {
+    try {
+      const teamsRes = await apiService.getTeams({ tournament_id: tournamentId, page: 1, limit: 100 })
+      let teamList = teamsRes?.data?.data || teamsRes?.data || []
+      if (!Array.isArray(teamList) && teamList.docs) teamList = teamList.docs
+      if (!Array.isArray(teamList)) teamList = []
+      setTeams(teamList)
+    } catch (err) {
+      console.error("Error fetching teams:", err)
+    }
+  }
+
   const filteredRows = useMemo(
     () => rows.filter((row) => row.values.join(' ').toLowerCase().includes(query.toLowerCase())),
     [query, rows],
@@ -73,8 +94,8 @@ export default function MatchesPage() {
     setEditingId(null)
     setFormValues({
       0: tournaments.length > 0 ? tournaments[0]._id : '',
-      1: teams.length > 0 ? teams[0]._id : '',
-      2: teams.length > 1 ? teams[1]._id : '',
+      1: '',
+      2: '',
       3: '',
       4: 'Upcoming',
       5: '',
@@ -92,8 +113,8 @@ export default function MatchesPage() {
     const st = row.original
     setFormValues({
       0: st.tournament_id?._id || st.tournament_id || (tournaments.length > 0 ? tournaments[0]._id : ''),
-      1: st.team1_id?._id || st.team1_id || (teams.length > 0 ? teams[0]._id : ''),
-      2: st.team2_id?._id || st.team2_id || (teams.length > 1 ? teams[1]._id : ''),
+      1: st.team1_id?._id || st.team1_id || '',
+      2: st.team2_id?._id || st.team2_id || '',
       3: st.venue || '',
       4: st.match_status || 'Upcoming',
       5: st.match_date ? st.match_date.split('T')[0] : '',
@@ -130,7 +151,7 @@ export default function MatchesPage() {
       }
 
       setModalOpen(false)
-      fetchData()
+      fetchMatches()
     } catch (err) {
       console.error("Error saving match:", err)
       alert("Failed to save match.")
@@ -141,7 +162,7 @@ export default function MatchesPage() {
     if (window.confirm("Are you sure you want to delete this match?")) {
       try {
         await apiService.deleteMatch({ id: row.id })
-        fetchData()
+        fetchMatches()
       } catch (err) {
         console.error("Error deleting match:", err)
         alert("Failed to delete match.")
@@ -156,7 +177,7 @@ export default function MatchesPage() {
     } catch (err) {
       console.error("Error updating status:", err)
       alert("Failed to update status.")
-      fetchData()
+      fetchMatches()
     }
   }
 

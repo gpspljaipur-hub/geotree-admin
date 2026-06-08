@@ -7,6 +7,34 @@ import { API_CONFIG } from '../config/endpoints'
 
 const filters = ['All', 'Occasion', 'Carbon Offset', 'IPL Dot Ball', 'Support Team']
 
+import { useRef } from 'react'
+
+const TemplateThumbnail = ({ html }) => {
+  const containerRef = useRef(null)
+  const [scale, setScale] = useState(1)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0].contentRect.width
+      setScale(width / 800)
+    })
+    observer.observe(containerRef.current)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <div ref={containerRef} className="w-full h-full relative overflow-hidden flex items-center justify-center">
+      <div 
+        className="w-[800px] h-[565px] flex-shrink-0 origin-center" 
+        style={{ transform: `scale(${scale})` }}
+      >
+        <div dangerouslySetInnerHTML={{ __html: html }} className="w-full h-full bg-white pointer-events-none" />
+      </div>
+    </div>
+  )
+}
+
 export default function CertificateTemplatesPage() {
   const [designerOpen, setDesignerOpen] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
@@ -38,13 +66,12 @@ export default function CertificateTemplatesPage() {
     setEditingId(null)
     setFormValues({
       name: '',
-      category: 'Occasion',
-      title: 'Certificate of Appreciation',
-      subTitle: 'Special Recognition',
-      description: 'Marking this special occasion...',
+      category: 'General',
+      title: 'ENVIRONMENTAL IMPACT AWARD',
+      subTitle: 'TEAM CONTRIBUTION RECOGNITION',
+      description: 'Thank you {{recipient}} for your incredible support. By helping us manage the plantation of {{qty}} trees at {{site}}, you are a vital part of our mission.',
       tagline: 'Nurturing a greener and more sustainable future',
-      primaryColor: 'Forest Green (Eco)',
-      template_file: ''
+      primaryColor: 'Sunset Orange'
     })
     setDesignerOpen(true)
   }
@@ -94,13 +121,18 @@ export default function CertificateTemplatesPage() {
         formData.append('template_file', formValues.template_file)
       }
       
+      const mappedColor = formValues.primaryColor?.includes('Green') ? '#2E8B57' : 
+                          formValues.primaryColor?.includes('Blue') ? '#0284c7' : 
+                          formValues.primaryColor?.includes('Orange') ? '#ea580c' : 
+                          formValues.primaryColor?.includes('Purple') ? '#7c3aed' : '#475569';
+
       // Generate HTML from form values and send it to the backend as the actual template layout
       const generatedHtml = generateCertificateHTML({
         title: formValues.title || 'Certificate Title',
         subTitle: formValues.subTitle || 'Sub Heading',
         description: formValues.description || 'Description',
         tagline: formValues.tagline || 'Tagline',
-        primaryColor: formValues.primaryColor || '#d97706',
+        primaryColor: mappedColor,
         recipient: '{{recipient}}',
         issueDate: '{{issue_date}}',
         certId: '{{certificate_id}}'
@@ -185,15 +217,15 @@ export default function CertificateTemplatesPage() {
             <div>
               <h3 className="text-[12px] font-black tracking-widest text-gray-400 uppercase mb-4 m-0">DESIGNER INSIGHT PREVIEW</h3>
               <div className="w-full bg-white border border-gray-100 rounded-[20px] shadow-sm p-4 lg:p-8 flex items-center justify-center">
-                <div className="w-full max-w-[800px] aspect-[1.414/1] bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden" style={{ minHeight: '400px' }}>
-                  <CertificatePreview values={{
+                <div className="w-full max-w-[800px] aspect-[1.414/1] bg-white shadow-sm overflow-hidden">
+                  <TemplateThumbnail html={generateCertificateHTML({
                     ...formValues,
-                    primaryColor: formValues.primaryColor?.includes('Green') ? '#2E8B57' : 
-                                  formValues.primaryColor?.includes('Blue') ? '#0284c7' : 
-                                  formValues.primaryColor?.includes('Orange') ? '#ea580c' : 
-                                  formValues.primaryColor?.includes('Purple') ? '#7c3aed' : '#475569',
-                    description: formValues.description || "Marking the occasion of [Occasion Name], this certificate acknowledges your thoughtful contribution of planting {{qty}} trees under the {{site}} initiative.\n\nYour gesture celebrates the moment while nurturing a greener and more sustainable future."
-                  }} />
+                    primaryColor: formValues.primaryColor,
+                    description: formValues.description,
+                    recipient: 'John Doe',
+                    qty: '50',
+                    site: 'Thar Desert Restoration'
+                  })} />
                 </div>
               </div>
             </div>
@@ -277,25 +309,49 @@ export default function CertificateTemplatesPage() {
           <div className="col-span-full py-12 text-center text-[14px] font-bold text-gray-500">Loading templates...</div>
         ) : filteredTemplates.length > 0 ? (
           filteredTemplates.map(template => {
-            const templateImage = template.template_file || template.background_image || template.image;
+            // Always generate fresh HTML for thumbnail to ensure color mapping fixes any old broken templates
+            const templateHtml = generateCertificateHTML(template);
+            const dotColor = template.primaryColor || '#ea580c';
+            
             return (
-              <div key={template._id || template.id} className="relative w-full min-h-[220px] bg-white border border-gray-200 rounded-[20px] shadow-sm flex flex-col overflow-hidden">
-                {templateImage && (
-                  <div className="absolute inset-0 z-0 opacity-15 mix-blend-multiply pointer-events-none">
-                    <img src={`${API_CONFIG.IMAGE_URL}${templateImage}`} alt="bg" className="w-full h-full object-cover" />
+              <div key={template._id || template.id} className="relative w-full bg-white border border-gray-200 rounded-[16px] shadow-sm flex flex-col overflow-hidden group">
+                <div 
+                  className="relative w-full bg-gray-100 overflow-hidden cursor-pointer"
+                  style={{ aspectRatio: '1.414/1' }}
+                  onClick={() => {
+                    setFormValues(template)
+                    setPreviewOpen(true)
+                  }}
+                >
+                  <div className="absolute inset-0 z-0">
+                    <TemplateThumbnail html={templateHtml} />
                   </div>
-                )}
-                <div className="flex-1 p-6 flex flex-col justify-between relative z-10 bg-gradient-to-br from-white/90 to-gray-50/90 backdrop-blur-sm">
+                  
+                  {/* Hover Overlay */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20">
+                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-gray-900 shadow-lg">
+                      <Icon name="eye" size={24} />
+                    </div>
+                  </div>
+                  
+                  {/* Active Badge */}
+                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-blue-700 text-[11px] font-bold px-2 py-1 rounded-full flex items-center gap-1 z-10 shadow-sm border border-blue-100">
+                    <Icon name="check" size={12} /> Active
+                  </div>
+                </div>
+
+                <div className="p-5 flex flex-col gap-4">
                   <div>
-                    <span className="inline-block px-3 py-1 mb-4 bg-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase rounded-lg shadow-sm border border-gray-200/50">{template.category || 'General'}</span>
-                    <h3 className="text-[18px] font-black text-gray-900 m-0 mb-2 leading-tight">{template.name || 'Unnamed Template'}</h3>
-                    <p className="text-[12px] font-semibold text-gray-600 m-0 line-clamp-2">{template.title || 'No title set'}</p>
+                    <h3 className="text-[16px] font-bold text-gray-900 m-0">{template.name || 'Unnamed Template'}</h3>
+                    <div className="w-2.5 h-2.5 rounded-full mt-2" style={{ backgroundColor: dotColor }} />
                   </div>
-                  <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
-                    <small className="text-[11px] font-bold text-gray-400">Created: {new Date(template.createdAt || Date.now()).toLocaleDateString()}</small>
-                    <div className="flex items-center gap-3">
-                      <button className="text-[13px] font-bold text-gray-400 hover:text-blue bg-transparent border-0 cursor-pointer transition-colors" onClick={() => openEdit(template)} title="Edit Template" type="button"><Icon name="edit" size={16} /></button>
-                      <button className="text-[13px] font-bold text-gray-400 hover:text-red-500 bg-transparent border-0 cursor-pointer transition-colors" onClick={() => handleDelete(template)} title="Delete Template" type="button"><Icon name="trash" size={16} /></button>
+                  <div className="flex items-center justify-between mt-auto">
+                    <div className="bg-gray-50 text-gray-600 text-[11px] font-bold px-3 py-1.5 rounded-[8px] border border-gray-100">
+                      For: {template.category || template.type || 'Support Team'}
+                    </div>
+                    <div className="flex gap-2 text-gray-400">
+                      <button className="hover:text-blue bg-transparent border-0 cursor-pointer transition-colors p-1" onClick={() => openEdit(template)} title="Edit Template" type="button"><Icon name="edit" size={16} /></button>
+                      <button className="hover:text-red-500 bg-transparent border-0 cursor-pointer transition-colors p-1" onClick={() => handleDelete(template)} title="Delete Template" type="button"><Icon name="trash" size={16} /></button>
                     </div>
                   </div>
                 </div>
@@ -314,15 +370,27 @@ export default function CertificateTemplatesPage() {
         <div className="fixed inset-0 z-[60] p-4 md:p-8 grid place-items-center bg-slate-900/60 backdrop-blur-md overflow-y-auto" role="presentation" onMouseDown={() => setPreviewOpen(false)}>
           <section className="relative w-full max-w-[900px] bg-white rounded-[24px] shadow-2xl overflow-hidden" onMouseDown={(event) => event.stopPropagation()}>
             <header className="flex items-center justify-between px-8 min-h-[70px] border-b border-gray-100 bg-gray-50/50">
-              <h3 className="m-0 text-[18px] font-black text-gray-900 tracking-tight">Preview: Template</h3>
+              <h3 className="m-0 text-[18px] font-black text-gray-900 tracking-tight">Preview: {formValues?.name || 'Template'}</h3>
               <button className="p-2 border-0 bg-transparent text-gray-400 hover:text-gray-900 cursor-pointer" onClick={() => setPreviewOpen(false)} type="button"><Icon name="x" size={20} /></button>
             </header>
-            <div className="p-8 bg-slate-50">
-              <CertificatePreview purple />
+            <div className="p-8 bg-slate-50 flex items-center justify-center">
+              <div className="w-full max-w-[800px] aspect-[1.414/1] bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                <TemplateThumbnail html={generateCertificateHTML({
+                    ...formValues,
+                    primaryColor: formValues.primaryColor,
+                    description: formValues.description,
+                    recipient: 'John Doe',
+                    qty: '50',
+                    site: 'Thar Desert Restoration'
+                  })} />
+              </div>
             </div>
             <footer className="flex justify-end gap-3 px-8 py-5 border-t border-gray-100 bg-white">
               <button className="min-h-[46px] px-6 text-[11px] font-bold tracking-widest uppercase text-gray-600 bg-white border border-gray-200 rounded-[13px] hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setPreviewOpen(false)} type="button">Close</button>
-              <button className="min-h-[46px] px-8 text-[11px] font-bold tracking-widest uppercase text-white bg-blue rounded-[13px] hover:bg-indigo transition-colors cursor-pointer border-0 shadow-lg shadow-blue/20" type="button">Use This Template</button>
+              <button className="min-h-[46px] px-8 text-[11px] font-bold tracking-widest uppercase text-white bg-blue rounded-[13px] hover:bg-indigo transition-colors cursor-pointer border-0 shadow-lg shadow-blue/20" type="button" onClick={() => {
+                setPreviewOpen(false);
+                openEdit(formValues);
+              }}>Use This Template</button>
             </footer>
           </section>
         </div>
