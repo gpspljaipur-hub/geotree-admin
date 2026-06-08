@@ -12,6 +12,7 @@ import {
   TableCard,
   Pagination,
 } from "../components/ui";
+import Icon from "../components/Icon";
 import { apiService } from "../config/apiService";
 import { API_CONFIG } from "../config/endpoints";
 
@@ -325,16 +326,24 @@ export default function PlantationSitesPage() {
       key: "col-2",
       label: "Land Info",
       render: (row) => (
-        <div className="flex flex-col gap-1">
-          <span className="text-[12px] font-black text-blue-700 flex items-center gap-1">
-            <span className="text-blue-500">📍</span>{" "}
-            {row.original.area || row.original.area_in_ha || "—"} HA
+        <div className="flex items-start gap-2.5">
+          <span className="text-[#2a54b3] pt-[3px]">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="3 14 12 19 21 14 12 9" />
+              <path d="M12 9V3" />
+              <path d="M12 3l4 3-4 3" />
+            </svg>
           </span>
-          <span className="text-[10px] font-mono text-gray-400">
-            {row.original.latitude && row.original.longitude
-              ? `${row.original.latitude}, ${row.original.longitude}`
-              : "—"}
-          </span>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[15px] font-semibold text-[#2a54b3]">
+              {row.original.area || row.original.area_in_ha || "—"}
+            </span>
+            <span className="text-[12px] font-semibold text-gray-400">
+              {row.original.lat && row.original.lng
+                ? `${row.original.lat}, ${row.original.lng}...`
+                : "—"}
+            </span>
+          </div>
         </div>
       ),
     },
