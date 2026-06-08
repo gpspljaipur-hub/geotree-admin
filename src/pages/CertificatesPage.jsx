@@ -1,9 +1,11 @@
 import { useState, useEffect, useMemo } from 'react'
+import { useLocation } from 'react-router-dom'
 import Icon from '../components/Icon'
 import { Badge, DataTable, Field, Modal, PageHeader, SearchBar, TableCard, Pagination } from '../components/ui'
 import { apiService } from '../config/apiService'
 
 export default function CertificatesPage() {
+  const location = useLocation()
   const [query, setQuery] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
@@ -42,6 +44,20 @@ export default function CertificatesPage() {
       setPlantations([])
     }
   }, [formValues.user_id])
+
+  useEffect(() => {
+    if (location.state?.autoOpenModal && location.state?.issueData) {
+      setEditingId(null)
+      setFormValues(prev => ({
+        ...prev,
+        user_id: location.state.issueData.user_id || '',
+        plantation_id: location.state.issueData.plantation_id || ''
+      }))
+      setModalOpen(true)
+      // Clear history state to prevent reopening on refresh
+      window.history.replaceState({}, document.title)
+    }
+  }, [location.state])
 
   const fetchUsers = async () => {
     try {

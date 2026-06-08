@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Icon from '../components/Icon'
 import { Badge, DataTable, PageHeader, SearchBar, TableCard, Tabs, Pagination, Modal, Field } from '../components/ui'
 import { apiService } from '../config/apiService'
@@ -11,6 +12,7 @@ const tabItems = [
 ]
 
 export default function UserPlantationsPage() {
+  const navigate = useNavigate()
   const [tab, setTab] = useState('occasion')
   const [query, setQuery] = useState('')
   const [rows, setRows] = useState([])
@@ -119,12 +121,16 @@ export default function UserPlantationsPage() {
   
   const columns = tab === 'occasion' ? occasionColumns : (tab === 'match' ? matchColumns : (tab === 'team' ? teamColumns : (tab === 'carbon' ? carbonColumns : occasionColumns)))
 
-  const [issueModalOpen, setIssueModalOpen] = useState(false)
-  const [issueRow, setIssueRow] = useState(null)
-
   const handleIssueClick = (row) => {
-    setIssueRow(row)
-    setIssueModalOpen(true)
+    const item = row.original;
+    const userId = item.user_id?._id || item.user_id || item.user || '';
+    const plantationId = item._id || item.id || '';
+    navigate('/certificates', { 
+      state: { 
+        autoOpenModal: true, 
+        issueData: { user_id: userId, plantation_id: plantationId } 
+      } 
+    })
   }
 
   const activeTabLabel = tabItems.find(t => t.id === tab)?.label || 'User Plantations'
@@ -147,39 +153,6 @@ export default function UserPlantationsPage() {
           </>
         )}
       </TableCard>
-      
-      {issueModalOpen && issueRow && (
-        <Modal
-          title="Register New Certificate"
-          submitLabel="REGISTER CERTIFICATE"
-          buttonTone="pink"
-          onClose={() => setIssueModalOpen(false)}
-          onSubmit={() => setIssueModalOpen(false)}
-        >
-          <div className="flex flex-col gap-6">
-            <Field 
-              label="SELECT USER" 
-              type="select" 
-              required 
-              options={[`${issueRow.user} - ${issueRow.phone}`]} 
-              value={`${issueRow.user} - ${issueRow.phone}`} 
-            />
-            <Field 
-              label="SELECT PLANTATION ORDER" 
-              type="select" 
-              required 
-              options={[`${issueRow.qty} Trees at ${issueRow.site.split(',')[0]} (6/1/2026)`]} 
-              value={`${issueRow.qty} Trees at ${issueRow.site.split(',')[0]} (6/1/2026)`} 
-            />
-            <Field 
-              label="CERTIFICATE CATEGORY (OPTIONAL - AUTO-DETECTED)" 
-              type="select" 
-              options={['Occasion / Event']} 
-              value="Occasion / Event" 
-            />
-          </div>
-        </Modal>
-      )}
     </>
   )
 }
