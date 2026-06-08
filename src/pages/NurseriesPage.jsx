@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from 'react'
+import Icon from '../components/Icon'
 import { Actions, Badge, DataTable, EntityCell, Field, Modal, PageHeader, SearchBar, StatusToggle, TableCard, Pagination } from '../components/ui'
 import { apiService } from '../config/apiService'
 import { API_CONFIG } from '../config/endpoints'
@@ -35,7 +36,9 @@ export default function NurseriesPage() {
       if (res?.pagination) setTotalPages(res.pagination.pages || 1)
       const dataList = res?.data?.data || res?.data || (Array.isArray(res) ? res : [])
       
-      const spList = speciesRes?.data?.data || speciesRes?.data || []
+      let spList = speciesRes?.data?.data || speciesRes?.data || (Array.isArray(speciesRes) ? speciesRes : [])
+      if (!Array.isArray(spList) && spList.docs) spList = spList.docs
+      if (!Array.isArray(spList)) spList = []
       setSpeciesList(spList)
       
       const mappedRows = dataList.map((st, index) => ({
@@ -153,7 +156,11 @@ export default function NurseriesPage() {
       }
 
       if (formValues[7] && formValues[7].length > 0) {
-        formData.append('stock', JSON.stringify(formValues[7]))
+        formValues[7].forEach((item, index) => {
+          formData.append(`stock[${index}][species_id]`, item.species_id)
+          if (item.name) formData.append(`stock[${index}][name]`, item.name)
+          formData.append(`stock[${index}][count]`, item.count)
+        })
       }
 
       if (editingId) {
