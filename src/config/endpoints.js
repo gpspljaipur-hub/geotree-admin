@@ -1,10 +1,10 @@
 export const API_CONFIG = {
-  BASE_URL: "http://192.168.0.19:5030/",
-  IMAGE_URL: "http://192.168.0.19:5030",
+  // BASE_URL: "http://192.168.0.19:5030/",
+  // IMAGE_URL: "http://192.168.0.19:5030",
   // BASE_URL: "https://192.168.0.16:5030/",
   // IMAGE_URL: "https://api.geotree.in",
-  //  baseurl: 'https://geotree-backend-8vxt.onrender.com/',
-  // imageurl: 'https://geotree-backend-8vxt.onrender.com',
+  BASE_URL: "https://geotree-backend-8vxt.onrender.com/",
+  IMAGE_URL: "https://geotree-backend-8vxt.onrender.com",
   // baseurlCertificate: "https://geotree-backend-8vxt.onrender.com",
   TIMEOUT: 10000,
 };
