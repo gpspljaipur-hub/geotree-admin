@@ -24,8 +24,8 @@ export default function PlantationSitesPage() {
 
   const fetchStates = async () => {
     try {
-      const res = await apiService.getStatesLocation()
-      const data = res?.data?.data || res?.data || []
+      const res = await apiService.getStates({ page: 1, limit: 1000 })
+      const data = res?.data || []
       const formatted = data.map(s => typeof s === 'string' 
         ? { label: s, value: s } 
         : { label: s.state_name || s.name || String(s), value: s._id || s.id || String(s) })
