@@ -16,12 +16,19 @@ import Icon from "../components/Icon";
 import { apiService } from "../config/apiService";
 import { API_CONFIG } from "../config/endpoints";
 
-import { MapContainer, TileLayer, FeatureGroup } from "react-leaflet";
-import { EditControl } from "react-leaflet-draw";
+import {
+  MapContainer,
+  TileLayer,
+  Polygon,
+  useMapEvents,
+  useMap,
+} from "react-leaflet";
 import * as turf from "@turf/turf";
 
 import "leaflet/dist/leaflet.css";
-import "leaflet-draw/dist/leaflet.draw.css";
+import { useRef } from "react";
+import "@geoman-io/leaflet-geoman-free";
+import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css";
 
 export default function PlantationSitesPage() {
   const [query, setQuery] = useState("");
@@ -39,7 +46,98 @@ export default function PlantationSitesPage() {
   const [speciesList, setSpeciesList] = useState([]);
   const [polygonCoordinates, setPolygonCoordinates] = useState([]);
   const [polygonArea, setPolygonArea] = useState("");
+  const mapRef = useRef(null);
   console.log("Polygon Coords:", polygonCoordinates);
+
+  function GeomanControls({ setPolygonCoordinates }) {
+    const map = useMap();
+
+    useEffect(() => {
+      map.pm.addControls({
+        position: "topleft",
+        drawPolygon: true,
+        drawRectangle: true,
+        drawCircle: false,
+        drawMarker: false,
+        drawPolyline: false,
+        editMode: true,
+        dragMode: true,
+        removalMode: true,
+      });
+
+      map.on("pm:create", (e) => {
+        const layer = e.layer;
+
+        if (layer.getLatLngs) {
+          const coords = layer.getLatLngs()[0].map((point) => ({
+            lat: point.lat,
+            lng: point.lng,
+          }));
+
+          setPolygonCoordinates(coords);
+        }
+      });
+
+      return () => {
+        map.pm.removeControls();
+      };
+    }, [map]);
+
+    return null;
+  }
+
+  function PolygonDrawer({ polygonCoordinates, setPolygonCoordinates }) {
+    useMapEvents({
+      click(e) {
+        setPolygonCoordinates((prev) => [
+          ...prev,
+          {
+            lat: e.latlng.lat,
+            lng: e.latlng.lng,
+          },
+        ]);
+      },
+    });
+
+    return null;
+  }
+
+  useEffect(() => {
+    if (polygonCoordinates.length < 3) return;
+
+    const geoCoords = polygonCoordinates.map((p) => [p.lng, p.lat]);
+    geoCoords.push(geoCoords[0]);
+
+    const polygon = turf.polygon([geoCoords]);
+
+    const areaSqMeters = turf.area(polygon);
+    const areaHa = areaSqMeters / 10000;
+
+    setPolygonArea(areaHa.toFixed(2));
+
+    setFormValues((prev) => ({
+      ...prev,
+      8: areaHa.toFixed(2),
+    }));
+  }, [polygonCoordinates]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+
+    if (!map) return;
+
+    map.pm.addControls({
+      position: "topleft",
+      drawPolygon: true,
+      drawRectangle: true,
+      drawCircle: false,
+      drawMarker: false,
+      drawPolyline: false,
+      editMode: true,
+      dragMode: true,
+      removalMode: true,
+    });
+  }, []);
 
   const polygonString = polygonCoordinates
     .map((point) => `${point.lat}, ${point.lng}`)
@@ -54,7 +152,8 @@ export default function PlantationSitesPage() {
   const fetchSpecies = async () => {
     try {
       const res = await apiService.getSpecies({ page: 1, limit: 1000 });
-      const data = res?.data?.data || res?.data || (Array.isArray(res) ? res : []);
+      const data =
+        res?.data?.data || res?.data || (Array.isArray(res) ? res : []);
       const formatted = data.map((s) => ({
         label: s.name || s.species_name || String(s),
         value: s._id || s.id || String(s),
@@ -173,7 +272,10 @@ export default function PlantationSitesPage() {
       11: row.original.status !== false ? "Active" : "Inactive",
       12: row.original.planted_count ?? "",
       13: row.original.remaining_trees ?? "",
-      14: row.original.native_species && row.original.native_species.length > 0 ? row.original.native_species[0] : "",
+      14:
+        row.original.native_species && row.original.native_species.length > 0
+          ? row.original.native_species[0]
+          : "",
     });
     setModalOpen(true);
   };
@@ -328,7 +430,16 @@ export default function PlantationSitesPage() {
       render: (row) => (
         <div className="flex items-start gap-2.5">
           <span className="text-[#2a54b3] pt-[3px]">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <polygon points="3 14 12 19 21 14 12 9" />
               <path d="M12 9V3" />
               <path d="M12 3l4 3-4 3" />
@@ -464,7 +575,6 @@ export default function PlantationSitesPage() {
               onChange={(val) => setFormValues((c) => ({ ...c, [6]: val }))}
             /> */}
 
-
             <Field
               label="Plantation Type"
               type="select"
@@ -477,7 +587,6 @@ export default function PlantationSitesPage() {
               <label className="block text-sm font-semibold mb-2">
                 Site Polygon Boundary *
               </label>
-
               <MapContainer
                 center={[26.9124, 75.7873]}
                 zoom={12}
@@ -489,20 +598,13 @@ export default function PlantationSitesPage() {
               >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-                <FeatureGroup>
-                  <EditControl
-                    position="topleft"
-                    draw={{
-                      rectangle: true,
-                      polygon: true,
-                      polyline: false,
-                      marker: false,
-                      circle: false,
-                      circlemarker: false,
-                    }}
-                    onCreated={handlePolygonCreated}
+                <GeomanControls setPolygonCoordinates={setPolygonCoordinates} />
+
+                {polygonCoordinates.length > 0 && (
+                  <Polygon
+                    positions={polygonCoordinates.map((p) => [p.lat, p.lng])}
                   />
-                </FeatureGroup>
+                )}
               </MapContainer>
 
               <p className="text-xs text-gray-500 mt-2">
