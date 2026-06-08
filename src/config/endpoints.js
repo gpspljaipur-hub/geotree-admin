@@ -3,6 +3,9 @@ export const API_CONFIG = {
   IMAGE_URL: "http://192.168.0.19:5030",
   // BASE_URL: "https://192.168.0.16:5030/",
   // IMAGE_URL: "https://api.geotree.in",
+  //  baseurl: 'https://geotree-backend-8vxt.onrender.com/',
+  // imageurl: 'https://geotree-backend-8vxt.onrender.com',
+  // baseurlCertificate: "https://geotree-backend-8vxt.onrender.com",
   TIMEOUT: 10000,
 };
 
@@ -72,4 +75,5 @@ export const ENDPOINTS = {
   SITE_INVENTORY_LIST: "api/site-inventory/list",
   CERTIFICATE_TEMPLATES_LIST: "api/certificate-templates/list",
   LOCATION_STATES: "api/location-data/states",
+  REGENERATE_FORM: "api/plantation/occasions/regenerate-forms",
 };
