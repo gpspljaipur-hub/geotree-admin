@@ -35,6 +35,7 @@ export default function PlantationSitesPage() {
   const [totalPages, setTotalPages] = useState(1);
 
   const [statesList, setStatesList] = useState([]);
+  const [speciesList, setSpeciesList] = useState([]);
   const [polygonCoordinates, setPolygonCoordinates] = useState([]);
   const [polygonArea, setPolygonArea] = useState("");
   console.log("Polygon Coords:", polygonCoordinates);
@@ -46,7 +47,22 @@ export default function PlantationSitesPage() {
   useEffect(() => {
     fetchSites();
     fetchStates();
+    fetchSpecies();
   }, [page]);
+
+  const fetchSpecies = async () => {
+    try {
+      const res = await apiService.getSpecies({ page: 1, limit: 1000 });
+      const data = res?.data?.data || res?.data || (Array.isArray(res) ? res : []);
+      const formatted = data.map((s) => ({
+        label: s.name || s.species_name || String(s),
+        value: s._id || s.id || String(s),
+      }));
+      setSpeciesList(formatted);
+    } catch (err) {
+      console.error("Error fetching species:", err);
+    }
+  };
 
   const fetchStates = async () => {
     try {
@@ -126,6 +142,9 @@ export default function PlantationSitesPage() {
       9: "",
       10: "",
       11: "Active",
+      12: "",
+      13: "",
+      14: "",
     });
     setModalOpen(true);
   };
@@ -151,6 +170,9 @@ export default function PlantationSitesPage() {
         : "",
       10: row.original.description || "",
       11: row.original.status !== false ? "Active" : "Inactive",
+      12: row.original.planted_count ?? "",
+      13: row.original.remaining_trees ?? "",
+      14: row.original.native_species && row.original.native_species.length > 0 ? row.original.native_species[0] : "",
     });
     setModalOpen(true);
   };
@@ -199,6 +221,11 @@ export default function PlantationSitesPage() {
       formData.append("capacity", formValues[7] || "0");
       formData.append("polygon", polygonString);
       formData.append("area_in_ha", formValues[8] || "0");
+      formData.append("planted_count", formValues[12] || "0");
+      formData.append("remaining_trees", formValues[13] || "0");
+      if (formValues[14]) {
+        formData.append("native_species", JSON.stringify([formValues[14]]));
+      }
       formData.append("description", formValues[10] || "");
       formData.append("status", String(formValues[11] === "Active"));
 
@@ -428,12 +455,6 @@ export default function PlantationSitesPage() {
               onChange={(val) => setFormValues((c) => ({ ...c, [6]: val }))}
             /> */}
 
-            <Field
-              label="Capacity"
-              placeholder="Total Capacity"
-              value={formValues[7]}
-              onChange={(val) => setFormValues((c) => ({ ...c, [7]: val }))}
-            />
 
             <Field
               label="Plantation Type"
@@ -485,6 +506,31 @@ export default function PlantationSitesPage() {
               placeholder="e.g. 2.5"
               value={polygonArea || formValues[8]}
               onChange={(val) => setFormValues((c) => ({ ...c, [8]: val }))}
+            />
+            <Field
+              label="Capacity"
+              placeholder="Total Capacity"
+              value={formValues[7]}
+              onChange={(val) => setFormValues((c) => ({ ...c, [7]: val }))}
+            />
+            <Field
+              label="Total Trees Planted"
+              placeholder=""
+              value={formValues[12]}
+              onChange={(val) => setFormValues((c) => ({ ...c, [12]: val }))}
+            />
+            <Field
+              label="Trees Remaining"
+              placeholder=""
+              value={formValues[13]}
+              onChange={(val) => setFormValues((c) => ({ ...c, [13]: val }))}
+            />
+            <Field
+              label="Native Species"
+              type="select"
+              options={speciesList}
+              value={formValues[14]}
+              onChange={(val) => setFormValues((c) => ({ ...c, [14]: val }))}
             />
             <Field
               label="Status"

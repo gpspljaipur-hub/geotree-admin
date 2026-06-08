@@ -30,7 +30,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem('geotree_auth') === 'true'
   })
-  
+
   const location = useLocation()
   const navigate = useNavigate()
 
