@@ -49,6 +49,43 @@ export default function PlantationSitesPage() {
   const mapRef = useRef(null);
   console.log("Polygon Coords:", polygonCoordinates);
 
+  // function GeomanControls({ setPolygonCoordinates }) {
+  //   const map = useMap();
+
+  //   useEffect(() => {
+  //     map.pm.addControls({
+  //       position: "topleft",
+  //       drawPolygon: true,
+  //       drawRectangle: true,
+  //       drawCircle: false,
+  //       drawMarker: false,
+  //       drawPolyline: false,
+  //       editMode: true,
+  //       dragMode: true,
+  //       removalMode: true,
+  //     });
+
+  //     map.on("pm:create", (e) => {
+  //       const layer = e.layer;
+
+  //       if (layer.getLatLngs) {
+  //         const coords = layer.getLatLngs()[0].map((point) => ({
+  //           lat: point.lat,
+  //           lng: point.lng,
+  //         }));
+
+  //         setPolygonCoordinates(coords);
+  //       }
+  //     });
+
+  //     return () => {
+  //       map.pm.removeControls();
+  //     };
+  //   }, [map]);
+
+  //   return null;
+  // }
+
   function GeomanControls({ setPolygonCoordinates }) {
     const map = useMap();
 
@@ -65,20 +102,36 @@ export default function PlantationSitesPage() {
         removalMode: true,
       });
 
+      const updateCoordinates = (layer) => {
+        if (!layer?.getLatLngs) return;
+
+        const coords = layer.getLatLngs()[0].map((point) => ({
+          lat: point.lat,
+          lng: point.lng,
+        }));
+
+        setPolygonCoordinates(coords);
+      };
+
+      // New polygon
       map.on("pm:create", (e) => {
-        const layer = e.layer;
+        updateCoordinates(e.layer);
+      });
 
-        if (layer.getLatLngs) {
-          const coords = layer.getLatLngs()[0].map((point) => ({
-            lat: point.lat,
-            lng: point.lng,
-          }));
+      // Existing polygon edited
+      map.on("pm:edit", (e) => {
+        updateCoordinates(e.layer);
+      });
 
-          setPolygonCoordinates(coords);
-        }
+      // Existing polygon dragged
+      map.on("pm:dragend", (e) => {
+        updateCoordinates(e.layer);
       });
 
       return () => {
+        map.off("pm:create");
+        map.off("pm:edit");
+        map.off("pm:dragend");
         map.pm.removeControls();
       };
     }, [map]);
@@ -229,6 +282,9 @@ export default function PlantationSitesPage() {
 
   const openCreate = () => {
     setEditingId(null);
+
+    setPolygonCoordinates([]);
+    setPolygonArea("");
     setFormValues({
       0: "",
       1: "",
@@ -251,6 +307,7 @@ export default function PlantationSitesPage() {
 
   const openEdit = (row) => {
     setEditingId(row.id);
+
     setFormValues({
       0: row.original.site_name || "",
       1:
@@ -264,19 +321,41 @@ export default function PlantationSitesPage() {
       5: row.original.village || "",
       6: row.original.plantation_type || "Miyawaki",
       7: row.original.capacity || "",
-      8: row.original.area || row.original.area_in_ha || "",
+      8: row.original.area || "",
       9: row.original.site_image
         ? `${API_CONFIG.IMAGE_URL}${row.original.site_image}`
         : "",
       10: row.original.description || "",
-      11: row.original.status !== false ? "Active" : "Inactive",
+      11: row.original.status ? "Active" : "Inactive",
       12: row.original.planted_count ?? "",
       13: row.original.remaining_trees ?? "",
       14:
-        row.original.native_species && row.original.native_species.length > 0
+        row.original.native_species?.length > 0
           ? row.original.native_species[0]
           : "",
     });
+
+    // GeoJSON -> Leaflet format
+    const coords =
+      row.original.boundary?.coordinates?.[0]?.map(([lng, lat]) => ({
+        lat,
+        lng,
+      })) || [];
+
+    // last duplicate point remove
+    if (coords.length > 1) {
+      const first = coords[0];
+      const last = coords[coords.length - 1];
+
+      if (first.lat === last.lat && first.lng === last.lng) {
+        coords.pop();
+      }
+    }
+
+    setPolygonCoordinates(coords);
+
+    setPolygonArea(row.original.area || "");
+
     setModalOpen(true);
   };
 
