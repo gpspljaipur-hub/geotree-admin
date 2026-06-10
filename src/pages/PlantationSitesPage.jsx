@@ -43,12 +43,12 @@ export default function PlantationSitesPage() {
   const [totalPages, setTotalPages] = useState(1);
 
   const [statesList, setStatesList] = useState([]);
+  const [districtsList, setDistrictsList] = useState([]);
   const [speciesList, setSpeciesList] = useState([]);
   const [polygonCoordinates, setPolygonCoordinates] = useState([]);
   const [polygonArea, setPolygonArea] = useState("");
   const mapRef = useRef(null);
-  console.log("Polygon Coords:", polygonCoordinates);
-
+  const [mapCenter, setMapCenter] = useState([]);
   // function GeomanControls({ setPolygonCoordinates }) {
   //   const map = useMap();
 
@@ -155,6 +155,37 @@ export default function PlantationSitesPage() {
     return null;
   }
 
+  function ChangeMapView({ center }) {
+    const map = useMap();
+
+    useEffect(() => {
+      map.flyTo(center, 13, {
+        duration: 1.5,
+      });
+    }, [center, map]);
+
+    return null;
+  }
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+
+        setMapCenter([latitude, longitude]);
+      },
+      (error) => {
+        console.error("Location error:", error);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      },
+    );
+  }, []);
+
   useEffect(() => {
     if (polygonCoordinates.length < 3) return;
 
@@ -202,6 +233,30 @@ export default function PlantationSitesPage() {
     fetchSpecies();
   }, [page]);
 
+  const getCoordinates = async (locationName) => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          locationName,
+        )}&countrycodes=in&limit=1`,
+      );
+
+      const data = await res.json();
+
+      if (data.length > 0) {
+        return {
+          lat: parseFloat(data[0].lat),
+          lng: parseFloat(data[0].lon),
+        };
+      }
+
+      return null;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
+
   const fetchSpecies = async () => {
     try {
       const res = await apiService.getSpecies({ page: 1, limit: 1000 });
@@ -227,6 +282,9 @@ export default function PlantationSitesPage() {
           : {
               label: s.state_name || s.name || String(s),
               value: s._id || s.id || String(s),
+              state_name: s.state_name,
+              lat: s.lat,
+              lng: s.lng,
             },
       );
       setStatesList(formatted);
@@ -235,6 +293,27 @@ export default function PlantationSitesPage() {
     }
   };
 
+  const fetchDistricts = async (state_name) => {
+    console.log("Fetching districts for state:", state_name);
+    try {
+      const res = await apiService.getDistrictsLocation({
+        state: state_name,
+      });
+
+      const data = res?.data || [];
+
+      const formatted = data.map((d) => ({
+        label: d.district_name,
+        value: d._id,
+        lat: d.lat,
+        lng: d.lng,
+      }));
+
+      setDistrictsList(formatted);
+    } catch (err) {
+      console.error("Error fetching districts:", err);
+    }
+  };
   const fetchSites = async () => {
     try {
       setLoading(true);
@@ -477,7 +556,7 @@ export default function PlantationSitesPage() {
         return (
           <EntityCell
             title={row.original.site_name || "Unnamed Site"}
-            subtitle={locationText ? `, ${locationText}` : ""}
+            subtitle={locationText ? ` ${locationText}` : ""}
             image={
               row.original.site_image
                 ? `${API_CONFIG.IMAGE_URL}${row.original.site_image}`
@@ -612,21 +691,54 @@ export default function PlantationSitesPage() {
                   : [{ label: "Loading...", value: "" }]
               }
               value={formValues[1]}
-              onChange={(val) => setFormValues((c) => ({ ...c, [1]: val }))}
+              onChange={async (val) => {
+                const selectedState = statesList.find(
+                  (item) => item.value === val,
+                );
+
+                setFormValues((c) => ({
+                  ...c,
+                  1: val,
+                  2: "",
+                }));
+
+                fetchDistricts(selectedState?.state_name);
+
+                const coords = await getCoordinates(selectedState?.state_name);
+
+                if (coords) {
+                  setMapCenter([coords.lat, coords.lng]);
+                }
+              }}
             />
             <Field
               label="District"
               required
               type="select"
-              options={[
-                "Chandigarh",
-                "Bhavnagar",
-                "Gadchiroli",
-                "Jaipur",
-                "Goa",
-              ]}
+              options={
+                districtsList.length > 0
+                  ? districtsList
+                  : [{ label: "Select State First", value: "" }]
+              }
               value={formValues[2]}
-              onChange={(val) => setFormValues((c) => ({ ...c, [2]: val }))}
+              onChange={async (val) => {
+                const selectedDistrict = districtsList.find(
+                  (item) => item.value === val,
+                );
+
+                setFormValues((c) => ({
+                  ...c,
+                  2: val,
+                }));
+
+                const coords = await getCoordinates(
+                  `${selectedDistrict.label}, India`,
+                );
+
+                if (coords) {
+                  setMapCenter([coords.lat, coords.lng]);
+                }
+              }}
             />
             <Field
               label="Block"
@@ -667,14 +779,16 @@ export default function PlantationSitesPage() {
                 Site Polygon Boundary *
               </label>
               <MapContainer
-                center={[26.9124, 75.7873]}
-                zoom={12}
+                center={mapCenter}
+                zoom={13}
                 style={{
                   height: "500px",
                   width: "100%",
                   borderRadius: "16px",
                 }}
               >
+                <ChangeMapView center={mapCenter} />
+
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
                 <GeomanControls setPolygonCoordinates={setPolygonCoordinates} />

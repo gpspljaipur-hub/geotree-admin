@@ -104,4 +104,6 @@ export const apiService = {
     postAuth(ENDPOINTS.SITE_INVENTORY_LIST, data),
   getStatesLocation: () => getAuth(ENDPOINTS.LOCATION_STATES),
   generateForm: (data) => postAuth(ENDPOINTS.REGENERATE_FORM),
+  getDistrictsLocation: (data) =>
+    postPublic(ENDPOINTS.LOCATION_DISTRICTS, data),
 };

@@ -76,4 +76,5 @@ export const ENDPOINTS = {
   CERTIFICATE_TEMPLATES_LIST: "api/certificate-templates/list",
   LOCATION_STATES: "api/location-data/states",
   REGENERATE_FORM: "api/plantation/occasions/regenerate-forms",
+  LOCATION_DISTRICTS: "api/location-data/districts",
 };
