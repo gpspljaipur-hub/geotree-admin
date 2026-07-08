@@ -380,6 +380,14 @@ export default function PlantationSitesPage() {
       12: "",
       13: "",
       14: "",
+      15: "",
+      16: "",
+      17: "",
+      18: "",
+      19: "",
+      20: "",
+      21: "No",
+      22: "",
     });
     setModalOpen(true);
   };
@@ -389,51 +397,59 @@ export default function PlantationSitesPage() {
 
     setFormValues({
       0: row.original.site_name || "",
+
       1:
         row.original.state_id?._id ||
         row.original.state_id?.id ||
         row.original.state_id ||
         "",
+
       2: row.original.district || "",
+
       3: row.original.block || "",
+
       4: row.original.gram_panchayat || "",
+
       5: row.original.village || "",
+
       6: row.original.plantation_type || "Miyawaki",
+
       7: row.original.capacity || "",
+
       8: row.original.area || "",
+
       9: row.original.site_image
         ? `${API_CONFIG.IMAGE_URL}${row.original.site_image}`
         : "",
+
       10: row.original.description || "",
+
       11: row.original.status ? "Active" : "Inactive",
+
       12: row.original.planted_count ?? "",
+
       13: row.original.remaining_trees ?? "",
-      14:
-        row.original.native_species?.length > 0
-          ? row.original.native_species[0]
-          : "",
+
+      // FIX NATIVE SPECIES
+      14: row.original.native_species?.map((item) => item._id) || [],
+
+      15: row.original.project_partner_name || "",
+
+      // FIX DATE
+      17: row.original.project_start_date
+        ? row.original.project_start_date.split("T")[0]
+        : "",
+
+      18: row.original.soil_type || "",
+
+      19: row.original.rain_fall || "",
+
+      20: row.original.maintenance || "",
+
+      21: row.original.is_popular || "No",
+
+      22: row.original.survival_rate || "",
     });
-
-    // GeoJSON -> Leaflet format
-    const coords =
-      row.original.boundary?.coordinates?.[0]?.map(([lng, lat]) => ({
-        lat,
-        lng,
-      })) || [];
-
-    // last duplicate point remove
-    if (coords.length > 1) {
-      const first = coords[0];
-      const last = coords[coords.length - 1];
-
-      if (first.lat === last.lat && first.lng === last.lng) {
-        coords.pop();
-      }
-    }
-
-    setPolygonCoordinates(coords);
-
-    setPolygonArea(row.original.area || "");
 
     setModalOpen(true);
   };
@@ -484,9 +500,17 @@ export default function PlantationSitesPage() {
       formData.append("area_in_ha", formValues[8] || "0");
       formData.append("planted_count", formValues[12] || "0");
       formData.append("remaining_trees", formValues[13] || "0");
-      if (formValues[14]) {
-        formData.append("native_species", JSON.stringify([formValues[14]]));
-      }
+      formData.append("survival_rate", formValues[22] || "0");
+      formData.append("project_start_date", formValues[17] || "");
+      formData.append("project_partner_name", formValues[15] || "");
+      formData.append("soil_type", formValues[18] || "");
+      formData.append("native_species", formValues[14] || "");
+      formData.append("rain_fall", formValues[19] || "");
+      formData.append("maintenance", formValues[20] || "");
+      formData.append("is_popular", formValues[21] || "");
+      // if (formValues[14]) {
+      //   formData.append("native_species", JSON.stringify([formValues[14]]));
+      // }
       formData.append("description", formValues[10] || "");
       formData.append("status", String(formValues[11] === "Active"));
 
@@ -517,7 +541,6 @@ export default function PlantationSitesPage() {
         fetchSites();
       } catch (err) {
         console.error("Error deleting plantation site:", err);
-        alert("Failed to delete plantation site.");
       }
     }
   };
@@ -773,6 +796,22 @@ export default function PlantationSitesPage() {
               value={formValues[6]}
               onChange={(val) => setFormValues((c) => ({ ...c, [6]: val }))}
             />
+            <Field
+              label="Project start date"
+              type="date"
+              placeholder="e.g. 07/16/2026"
+              value={formValues[17]}
+              onChange={(val) => setFormValues((c) => ({ ...c, [17]: val }))}
+            />
+
+            <Field
+              label="Project partner name"
+              placeholder="e.g. Green Initiative"
+              type="text"
+              full
+              value={formValues[15]}
+              onChange={(val) => setFormValues((c) => ({ ...c, [15]: val }))}
+            />
 
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold mb-2">
@@ -833,9 +872,51 @@ export default function PlantationSitesPage() {
               label="Native Species"
               type="select"
               options={speciesList}
-              value={formValues[14]}
-              onChange={(val) => setFormValues((c) => ({ ...c, [14]: val }))}
+              multiple
+              value={formValues[14] || []}
+              onChange={(val) =>
+                setFormValues((c) => ({
+                  ...c,
+                  14: val,
+                }))
+              }
             />
+            <Field
+              label="Soil type"
+              placeholder="e.g. Alluvial, Clay, Sand"
+              type="text"
+              value={formValues[18]}
+              onChange={(val) => setFormValues((c) => ({ ...c, [18]: val }))}
+            />
+            <Field
+              label="Rainfall (in mm)"
+              placeholder="e.g. 1000, 1500, 2000"
+              type="text"
+              value={formValues[19]}
+              onChange={(val) => setFormValues((c) => ({ ...c, [19]: val }))}
+            />
+            <Field
+              label="Maintanance"
+              placeholder="e.g. 3 years, 5 years"
+              type="text"
+              value={formValues[20]}
+              onChange={(val) => setFormValues((c) => ({ ...c, [20]: val }))}
+            />
+            <Field
+              label="Popular"
+              type="select"
+              options={["Yes", "No"]}
+              value={formValues[21]}
+              onChange={(val) => setFormValues((c) => ({ ...c, [21]: val }))}
+            />
+            <Field
+              label="survival rate(%)"
+              placeholder="e.g. 70% , 80%, 96%"
+              type="text"
+              value={formValues[22]}
+              onChange={(val) => setFormValues((c) => ({ ...c, [22]: val }))}
+            />
+
             <Field
               label="Status"
               type="select"
